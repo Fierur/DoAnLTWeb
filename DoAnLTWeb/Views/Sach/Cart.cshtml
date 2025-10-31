@@ -6,6 +6,7 @@
 }
 
 <div class="container mt-4">
+    @Html.AntiForgeryToken()
     <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Giỏ hàng của bạn</h2>
 
     @if (cartItems == null || !cartItems.Any())
@@ -53,18 +54,18 @@
                             <strong>@sach.TenSach</strong><br />
                             <small class="text-muted">Thể loại: @(sach.TheLoaiSach?.TenTLS ?? "N/A")</small>
                         </td>
-                        <td>@string.Format("{0:N0} ₫", donGia)</td>
+                        <td class="item-price" data-price="@donGia">@string.Format("{0:N0} ₫", donGia)</td>
                         <td>
                             <div class="input-group input-group-sm">
                                 <button class="btn btn-outline-secondary btn-minus" type="button">-</button>
                                 <input type="number" class="form-control text-center cart-qty"
-                                       value="@soLuong" min="0" style="max-width: 60px;" />
+                                       value="@soLuong" min="1" style="max-width: 60px;" />
                                 <button class="btn btn-outline-secondary btn-plus" type="button">+</button>
                             </div>
                         </td>
                         <td class="item-total">@string.Format("{0:N0} ₫", thanhTien)</td>
                         <td>
-                            <button class="btn btn-danger btn-sm btn-remove">
+                            <button class="btn btn-danger btn-sm btn-remove" title="Xóa sản phẩm">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
@@ -90,12 +91,25 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Hàm tính toán lại tổng tiền
+            function recalculateTotal() {
+                var total = 0;
+                $('#cartTableBody tr').each(function () {
+                    var price = parseFloat($(this).find('.item-price').data('price'));
+                    var qty = parseInt($(this).find('.cart-qty').val());
+                    total += price * qty;
+                });
+                $('#cartTotal').text(total.toLocaleString('vi-VN') + ' ₫');
+            }
+
             // Giảm số lượng
             $(".btn-minus").click(function () {
                 var row = $(this).closest("tr");
                 var input = row.find(".cart-qty");
                 var value = parseInt(input.val()) - 1;
-                if (value >= 0) input.val(value).trigger("change");
+                if (value >= 1) {
+                    input.val(value).trigger("change");
+                }
             });
 
             // Tăng số lượng
@@ -112,6 +126,11 @@
                 var bookId = row.data("book-id");
                 var quantity = parseInt($(this).val());
 
+                if (quantity < 1) {
+                    $(this).val(1);
+                    return;
+                }
+
                 $.ajax({
                     url: '@Url.Action("UpdateCartQuantity", "Sach")',
                     type: "POST",
@@ -122,11 +141,22 @@
                     },
                     success: function (res) {
                         if (res.success) {
+                            // Cập nhật thành tiền của dòng
                             row.find(".item-total").text(res.itemTotal.toLocaleString("vi-VN") + " ₫");
+                            // Cập nhật tổng tiền giỏ hàng
                             $("#cartTotal").text(res.cartTotal.toLocaleString("vi-VN") + " ₫");
+                            // Cập nhật badge giỏ hàng
+                            if (window.updateCartCount) {
+                                window.updateCartCount();
+                            }
                         } else {
                             alert(res.message);
+                            location.reload();
                         }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra. Vui lòng thử lại!');
+                        location.reload();
                     }
                 });
             });
@@ -147,12 +177,29 @@
                     },
                     success: function (res) {
                         if (res.success) {
-                            row.fadeOut(300, function () { $(this).remove(); });
-                            $("#cartTotal").text(res.cartTotal?.toLocaleString("vi-VN") + " ₫");
-                            if ($("#cartTableBody tr").length === 0) location.reload();
+                            // Xóa dòng với hiệu ứng
+                            row.fadeOut(300, function () {
+                                $(this).remove();
+
+                                // Kiểm tra nếu giỏ hàng rỗng thì reload trang
+                                if ($("#cartTableBody tr").length === 0) {
+                                    location.reload();
+                                } else {
+                                    // Cập nhật lại tổng tiền
+                                    recalculateTotal();
+                                }
+                            });
+
+                            // Cập nhật badge giỏ hàng
+                            if (window.updateCartCount) {
+                                window.updateCartCount();
+                            }
                         } else {
                             alert(res.message);
                         }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra. Vui lòng thử lại!');
                     }
                 });
             });

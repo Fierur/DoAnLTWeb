@@ -383,53 +383,7 @@ namespace DoAnLTWeb.Controllers
             return View();
         }
 
-        // POST: Order/CancelOrder - Hủy đơn hàng
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult CancelOrder(int maDon, string lyDoHuy)
-        {
-            // Kiểm tra đăng nhập
-            if (Session["MaKH"] == null)
-            {
-                return Json(new { success = false, message = "Vui lòng đăng nhập!" });
-            }
-
-            int maKH = (int)Session["MaKH"];
-
-            // Lấy đơn hàng
-            var donHang = db.DonDatHangs
-                .FirstOrDefault(d => d.MaDon == maDon && d.MaKH == maKH);
-
-            if (donHang == null)
-            {
-                return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
-            }
-
-            // Kiểm tra trạng thái đơn hàng (chỉ hủy được khi đang "Chờ xác nhận")
-            var trangThaiHienTai = db.ChiTietTrangThais
-                .Where(ct => ct.MaDon == maDon)
-                .OrderByDescending(ct => ct.NgayCapNhatTT)
-                .FirstOrDefault();
-
-            if (trangThaiHienTai == null || trangThaiHienTai.MaTT != 1001)
-            {
-                return Json(new { success = false, message = "Chỉ có thể hủy đơn hàng đang 'Chờ xác nhận'!" });
-            }
-
-            // Cập nhật trạng thái thành "Đã hủy"
-            var trangThaiHuy = new ChiTietTrangThai
-            {
-                MaDon = maDon,
-                MaTT = 1004, // Đã hủy
-                NgayCapNhatTT = DateTime.Now,
-                GhiChuTT = string.IsNullOrEmpty(lyDoHuy) ? "Khách hàng hủy đơn" : lyDoHuy
-            };
-
-            db.ChiTietTrangThais.Add(trangThaiHuy);
-            db.SaveChanges();
-
-            return Json(new { success = true, message = "Hủy đơn hàng thành công!" });
-        }
+        
 
         protected override void Dispose(bool disposing)
         {

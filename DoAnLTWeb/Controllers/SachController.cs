@@ -245,9 +245,14 @@ namespace DoAnLTWeb.Controllers
                 db.SaveChanges();
 
                 // Đếm tổng số lượng sản phẩm trong giỏ
+                //int cartCount = db.ChiTietGHs
+                //    .Where(c => c.MaGH == maGH)
+                //    .Sum(c => c.SoLuongSachCTGH ?? 0);
                 int cartCount = db.ChiTietGHs
                     .Where(c => c.MaGH == maGH)
-                    .Sum(c => c.SoLuongSachCTGH ?? 0);
+                    .Select(c => c.SoLuongSachCTGH)
+                    .DefaultIfEmpty(0)
+                    .Sum() ?? 0;
 
                 return Json(new { success = true, cartCount = cartCount, message = "Đã thêm vào giỏ hàng!" });
             }
@@ -290,9 +295,14 @@ namespace DoAnLTWeb.Controllers
                 db.SaveChanges();
 
                 // Cập nhật số lượng giỏ hàng
+                //int cartCount = db.ChiTietGHs
+                //    .Where(c => c.MaGH == maGH)
+                //    .Sum(c => c.SoLuongSachCTGH ?? 0);
                 int cartCount = db.ChiTietGHs
                     .Where(c => c.MaGH == maGH)
-                    .Sum(c => c.SoLuongSachCTGH ?? 0);
+                    .Select(c => c.SoLuongSachCTGH)
+                    .DefaultIfEmpty(0)
+                    .Sum() ?? 0;
 
                 return Json(new { success = true, cartCount = cartCount, message = "Đã xóa khỏi giỏ hàng!" });
             }
@@ -401,9 +411,14 @@ namespace DoAnLTWeb.Controllers
                     return Json(new { success = true, cartCount = 0 }, JsonRequestBehavior.AllowGet);
                 }
 
+                //int cartCount = db.ChiTietGHs
+                //    .Where(c => c.MaGH == khachHang.MaGH.Value)
+                //    .Sum(c => c.SoLuongSachCTGH ?? 0);
                 int cartCount = db.ChiTietGHs
                     .Where(c => c.MaGH == khachHang.MaGH.Value)
-                    .Sum(c => c.SoLuongSachCTGH ?? 0);
+                    .Select(c => c.SoLuongSachCTGH)
+                    .DefaultIfEmpty(0)
+                    .Sum() ?? 0;
 
                 return Json(new { success = true, cartCount = cartCount }, JsonRequestBehavior.AllowGet);
             }
