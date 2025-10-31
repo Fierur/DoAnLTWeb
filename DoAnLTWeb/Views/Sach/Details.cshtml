@@ -6,6 +6,7 @@
 }
 
 <div class="container mt-4">
+    @Html.AntiForgeryToken()
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -92,22 +93,15 @@
                     </table>
 
                     <div class="d-grid gap-2">
-                        @Html.ActionLink(
-                            "Thêm vào giỏ hàng",
-                            "AddToCart",
-                            "Cart",
-                            new { id = Model.MaSach, returnUrl = Request.Url?.ToString() },
-                            new { @class = "btn btn-success btn-lg w-100" }
-                        )
+                        <button class="btn btn-success btn-lg w-100" id="btnAddToCart">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ hàng
+                        </button>
 
-                        @Html.ActionLink(
-                            "Mua ngay",
-                            "BuyNow",
-                            "Cart",
-                            new { id = Model.MaSach },
-                            new { @class = "btn btn-danger btn-lg w-100" }
-                        )
+                        <button class="btn btn-danger btn-lg w-100" id="btnBuyNow">
+                            <i class="fas fa-bolt"></i> Mua ngay
+                        </button>
                     </div>
+
                 </div>
             </div>
 
@@ -170,3 +164,98 @@
         @Html.ActionLink("← Quay lại danh sách", "Index", null, new { @class = "btn btn-secondary" })
     </div>
 </div>
+
+
+@section Scripts {
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // Hàm hiển thị thông báo đăng nhập
+            function showLoginPrompt() {
+                Swal.fire({
+                    title: "Bạn chưa đăng nhập!",
+                    text: "Bạn cần đăng nhập để tiếp tục.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Đăng nhập ngay",
+                    cancelButtonText: "Hủy",
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href =
+                            '@Url.Action("Login", "Account")' +
+                            '?returnUrl=' + encodeURIComponent(window.location.href);
+                    }
+                });
+            }
+
+            // Khi bấm Thêm vào giỏ hàng
+            $("#btnAddToCart").click(function () {
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Sach")',
+                    type: "POST",
+                    data: {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                        bookId: @Model.MaSach,
+                        quantity: 1
+                    },
+                    success: function (res) {
+                        if (res.requireLogin) {
+                            showLoginPrompt();
+                        } else if (res.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Đã thêm vào giỏ hàng!",
+                                text: res.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire("Lỗi", res.message, "error");
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Lỗi", "Không thể thêm sản phẩm. Vui lòng thử lại!", "error");
+                    }
+                });
+            });
+
+            // Khi bấm Mua ngay
+            $("#btnBuyNow").click(function () {
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Sach")',
+                    type: "POST",
+                    data: {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                        bookId: @Model.MaSach,
+                        quantity: 1
+                    },
+                    success: function (res) {
+                        if (res.requireLogin) {
+                            showLoginPrompt();
+                        } else if (res.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Thành công!",
+                                text: "Sản phẩm đã được thêm. Đang chuyển đến trang thanh toán...",
+                                showConfirmButton: false,
+                                timer: 1200
+                            }).then(() => {
+                                window.location.href = '@Url.Action("Checkout", "Order")';
+                            });
+                        } else {
+                            Swal.fire("Lỗi", res.message, "error");
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Lỗi", "Không thể mua ngay. Vui lòng thử lại!", "error");
+                    }
+                });
+            });
+        });
+    </script>
+}
