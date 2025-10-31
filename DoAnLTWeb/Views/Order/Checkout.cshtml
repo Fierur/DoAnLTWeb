@@ -72,7 +72,7 @@
             {
                 var sach = item.Sach;
                 <li class="list-group-item d-flex justify-content-between">
-                    <span>@sach.TenSach (x@item.SoLuongSachCTGH)</span>
+                    <span>@sach.TenSach (x@(item.SoLuongSachCTGH))</span>
                     <span>@String.Format("{0:N0} đ", sach.Gia * item.SoLuongSachCTGH)</span>
                 </li>
             }
@@ -85,31 +85,61 @@
 
 @section Scripts {
     <script>
-    // AJAX load quận huyện và xã phường
-    $("#ddlTP").change(function () {
-        var maTP = $(this).val();
-        $("#ddlQH").empty();
-        $("#ddlXP").empty();
-        if (maTP) {
-            $.getJSON('/Order/GetQuanHuyen', { maTP: maTP }, function (data) {
-                $("#ddlQH").append('<option value="">-- Chọn quận huyện --</option>');
-                $.each(data, function (i, item) {
-                    $("#ddlQH").append('<option value="' + item.MaQH + '">' + item.TenQH + '</option>');
+        // AJAX load quận huyện và xã phường 
+        $("#ddlTP").change(function () {
+            var maTP = $(this).val();
+            $("#ddlQH").empty();
+            $("#ddlXP").empty();
+            if (maTP) {
+                $.getJSON('/Order/GetQuanHuyen', { maTP: maTP }, function (data) {
+                    $("#ddlQH").append('<option value="">-- Chọn quận huyện --</option>');
+                    $.each(data, function (i, item) {
+                        $("#ddlQH").append('<option value="' + item.MaQH + '">' + item.TenQH + '</option>');
+                    });
                 });
-            });
-        }
-    });
-    $("#ddlQH").change(function () {
-        var maQH = $(this).val();
-        $("#ddlXP").empty();
-        if (maQH) {
-            $.getJSON('/Order/GetXaPhuong', { maQH: maQH }, function (data) {
-                $("#ddlXP").append('<option value="">-- Chọn xã phường --</option>');
-                $.each(data, function (i, item) {
-                    $("#ddlXP").append('<option value="' + item.MaXP + '">' + item.TenXP + ' (+' + item.ChiPhiGHXP + ' đ)</option>');
+            }
+        });
+        $("#ddlQH").change(function () {
+            var maQH = $(this).val();
+            $("#ddlXP").empty();
+            if (maQH) {
+                $.getJSON('/Order/GetXaPhuong', { maQH: maQH }, function (data) {
+                    $("#ddlXP").append('<option value="">-- Chọn xã phường --</option>');
+                    $.each(data, function (i, item) {
+                        $("#ddlXP").append('<option value="' + item.MaXP + '">' + item.TenXP + ' (+' + item.ChiPhiGHXP + ' đ)</option>');
+                    });
                 });
-            });
-        }
-    });
+            }
+        });
+
+        // Kiểm tra trước khi submit
+        $("form").submit(function (e) {
+            var diaChiCoSan = $("select[name='diaChiCoSanId']").val();
+            var hoTenNN = $("input[name='hoTenNN']").val().trim();
+            var soNha = $("input[name='soNha']").val().trim();
+            var maTP = $("#ddlTP").val();
+            var maQH = $("#ddlQH").val();
+            var maXP = $("#ddlXP").val();
+            var httt = $("select[name='maHTTT']").val();
+
+            // Nếu chưa chọn địa chỉ có sẵn thì bắt buộc phải nhập địa chỉ mới đầy đủ
+            if (!diaChiCoSan) {
+                if (!hoTenNN || !soNha || !maTP || !maQH || !maXP) {
+                    alert("Vui lòng nhập đầy đủ thông tin địa chỉ giao hàng!");
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            // Kiểm tra hình thức thanh toán
+            if (!httt) {
+                alert("Vui lòng chọn hình thức thanh toán!");
+                e.preventDefault();
+                return false;
+            }
+
+            // Nếu qua được hết, form mới được submit
+            return true;
+        });
     </script>
-}
+}}
