@@ -1,0 +1,153 @@
+﻿@model IEnumerable<DoAnLTWeb.Models.Sach>
+
+@{
+    ViewBag.Title = "Danh Sách Sách";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Danh Sách Sách</h2>
+
+    <div class="row">
+        <!-- Sidebar Menu Thể Loại -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thể Loại Sách</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            @Html.ActionLink("Tất cả sách", "Index", null, new { @class = "text-decoration-none" })
+                        </li>
+                        @if (ViewBag.TheLoaiMenu != null)
+                        {
+                            foreach (var item in ViewBag.TheLoaiMenu)
+                            {
+                                var theLoai = item.TheLoai;
+                                var children = item.Children;
+
+                                <li class="list-group-item">
+                                    @Html.ActionLink((string)theLoai.TenTLS, "Index", new { theLoaiId = theLoai.MaTLS }, new { @class = "text-decoration-none" })
+
+                                    @* Nếu có thể loại con (menu đa cấp) *@
+                                    @if (children != null && children.Count > 0)
+                                    {
+                                        <ul class="list-unstyled ms-3 mt-2">
+                                            @foreach (var child in children)
+                                            {
+                                                <li class="mb-1">
+                                                    <small>
+                                                        @Html.ActionLink("→ " + (string)child.TenTLS, "Index", new { theLoaiId = child.MaTLS }, new { @class = "text-decoration-none text-muted" })
+                                                    </small>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung chính -->
+        <div class="col-md-9">
+            <!-- Form tìm kiếm -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    @using (Html.BeginForm("Index", "Sach", FormMethod.Get, new { @class = "row g-3" }))
+                    {
+                        <div class="col-md-10">
+                            <input type="text" name="searchString" class="form-control"
+                                   placeholder="Tìm kiếm sách theo tên..."
+                                   value="@ViewBag.SearchString" />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Tìm kiếm
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* Hiển thị thông tin đang lọc *@
+            @if (!string.IsNullOrEmpty(ViewBag.TenTheLoai))
+            {
+                <div class="alert alert-info">
+                    Đang hiển thị sách thuộc thể loại: <strong>@ViewBag.TenTheLoai</strong>
+                    @Html.ActionLink("Xóa bộ lọc", "Index", null, new { @class = "btn btn-sm btn-outline-secondary ms-2" })
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(ViewBag.SearchString))
+            {
+                <div class="alert alert-info">
+                    Kết quả tìm kiếm cho: <strong>"@ViewBag.SearchString"</strong>
+                    (@Model.Count() sách)
+                </div>
+            }
+
+            <!-- Danh sách sách -->
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                @if (!string.IsNullOrEmpty(item.Hinh))
+                                {
+                                    <img src="@Url.Content("~/Images/" + item.Hinh)"
+                                         class="card-img-top"
+                                         alt="@item.TenSach"
+                                         style="height: 300px; object-fit: cover;"
+                                         onerror="this.src='@Url.Content("~/Images/no-image.jpg")'" />
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+                                         style="height: 300px;">
+                                        <span class="text-white">Không có ảnh</span>
+                                    </div>
+                                }
+
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">@item.TenSach</h5>
+                                    <p class="card-text text-muted">
+                                        <small>@(item.TheLoaiSach != null ? item.TheLoaiSach.TenTLS : "N/A")</small>
+                                    </p>
+                                    <p class="card-text">
+                                        @if (!string.IsNullOrEmpty(item.Mota) && item.Mota.Length > 100)
+                                        {
+                                            @item.Mota.Substring(0, 100)<text>...</text>
+                                        }
+                                        else
+                                        {
+                                            @item.Mota
+                                        }
+                                    </p>
+                                    <div class="mt-auto">
+                                        <p class="h5 text-danger mb-2">
+                                            @(item.Gia != null ? string.Format("{0:N0} ₫", item.Gia) : "Liên hệ")
+                                        </p>
+                                        @Html.ActionLink("Xem chi tiết", "Details", new { id = item.MaSach }, new { @class = "btn btn-primary w-100" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center">
+                    <h4>Không tìm thấy sách nào!</h4>
+                    <p>Vui lòng thử lại với từ khóa khác hoặc xóa bộ lọc.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

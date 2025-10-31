@@ -17,9 +17,30 @@
             </button>
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Books
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="booksDropdown">
+                            <li>@Html.ActionLink("All Books", "Index", "Sach", new { area = "" }, new { @class = "dropdown-item" })</li>
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle" href="#">By Category</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Fiction", "Category", "Sach", new { id = 1 }, new { @class = "dropdown-item" })</li>
+                                    <li>@Html.ActionLink("Non-Fiction", "Category", "Sach", new { id = 2 }, new { @class = "dropdown-item" })</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })
+                    </li>
                 </ul>
             </div>
         </div>
@@ -34,6 +55,7 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/multilevel")
     @RenderSection("scripts", required: false)
 </body>
 </html>
