@@ -1,0 +1,40 @@
+﻿@model DoAnLTWeb.Models.KhachHang
+@{
+    ViewBag.Title = "Chỉnh sửa thông tin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center mt-4">Chỉnh sửa thông tin</h2>
+
+@using (Html.BeginForm("Edit", "Account", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.MaKH)
+
+    <div class="form-group">
+        <label>Họ tên</label>
+        @Html.TextBoxFor(m => m.HoTenKH, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Email</label>
+        @Html.TextBoxFor(m => m.email, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Số điện thoại</label>
+        @Html.TextBoxFor(m => m.SDT, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Địa chỉ</label>
+        @Html.TextBoxFor(m => m.DiaChiKH, new { @class = "form-control" })
+    </div>
+
+    if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+    }
+
+    <button type="submit" class="btn btn-primary mt-3 w-100">Lưu thay đổi</button>
+}

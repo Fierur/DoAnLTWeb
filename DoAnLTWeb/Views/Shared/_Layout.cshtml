@@ -3,59 +3,460 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Nhà sách trực tuyến</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Header */
+        .top-header {
+            background-color: #c92127;
+            color: white;
+            padding: 10px 0;
+        }
+
+            .top-header .container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #c92127;
+            padding: 5px;
+            border-radius: 4px;
+            width: fit-content; /* Giúp ô co theo nội dung */
+            margin: 0 auto;
+        }
+
+            .search-box form {
+                display: flex;
+                width: 100%;
+            }
+
+            .search-box input[type="text"] {
+                border: none;
+                padding: 8px 12px;
+                border-radius: 4px 0 0 4px;
+                outline: none;
+                width: 250px;
+                box-sizing: border-box;
+            }
+
+            .search-box button {
+                border: none;
+                background-color: #c92127;
+                color: white;
+                padding: 8px 12px;
+                border-radius: 0 4px 4px 0;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+                .search-box button:hover {
+                    background-color: #a3191f;
+                }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+            .header-icons a {
+                color: white;
+                text-decoration: none;
+                position: relative;
+            }
+
+            .header-icons i {
+                font-size: 24px;
+            }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffd700;
+            color: #c92127;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+            .main-nav .container {
+                display: flex;
+                gap: 30px;
+                padding: 0;
+            }
+
+            .main-nav a {
+                color: #333;
+                text-decoration: none;
+                padding: 15px 0;
+                display: block;
+                font-weight: 500;
+                transition: color 0.3s;
+            }
+
+                .main-nav a:hover {
+                    color: #c92127;
+                }
+
+                .main-nav a.active {
+                    color: #c92127;
+                    border-bottom: 2px solid #c92127;
+                }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-size: 14px;
+            margin: 10px 0;
+            height: 40px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price {
+            color: #c92127;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .btn-add-cart {
+            background: #c92127;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+            .btn-add-cart:hover {
+                background: #a01b20;
+            }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+            footer .container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+            }
+
+            footer h4 {
+                margin-bottom: 15px;
+                color: #ffd700;
+            }
+
+            footer a {
+                color: white;
+                text-decoration: none;
+                display: block;
+                margin: 5px 0;
+            }
+
+                footer a:hover {
+                    color: #ffd700;
+                }
+
+        /* Sidebar Category */
+        .page-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+            .sidebar h3 {
+                margin-bottom: 15px;
+                color: #c92127;
+                font-size: 18px;
+            }
+
+        .category-list {
+            list-style: none;
+        }
+
+            .category-list li {
+                margin: 10px 0;
+            }
+
+            .category-list a {
+                color: #333;
+                text-decoration: none;
+                display: block;
+                padding: 8px 10px;
+                border-radius: 4px;
+                transition: all 0.3s;
+            }
+
+                .category-list a:hover,
+                .category-list a.active {
+                    background: #f5f5f5;
+                    color: #c92127;
+                    padding-left: 15px;
+                }
+
+        /* Alert */
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+    <!-- Top Header -->
+    <div class="top-header">
         <div class="container">
-            @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Books
+            <a href="@Url.Action("Index", "Sach")" class="logo">
+                <i class="fas fa-book"></i> FAHASA
+            </a>
+
+            <div class="search-box">
+                <form action="@Url.Action("Index", "Sach")" method="get">
+                    <input type="text" name="searchKey" placeholder="Tìm kiếm sách..." value="@ViewBag.SearchKey" />
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="header-icons">
+                <a href="@Url.Action("Cart", "Sach")" title="Giỏ hàng">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+
+                @if (Session["MaKH"] != null)
+                {
+                    <div style="position: relative; display: inline-block;">
+                        <a href="#" onclick="toggleUserMenu(); return false;" title="Tài khoản" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-user-circle"></i>
+                            <span style="font-size: 14px;">@Session["HoTenKH"]</span>
+                            <i class="fas fa-caret-down" style="font-size: 12px;"></i>
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="booksDropdown">
-                            <li>@Html.ActionLink("All Books", "Index", "Sach", new { area = "" }, new { @class = "dropdown-item" })</li>
-                            <li class="dropdown-submenu">
-                                <a class="dropdown-item dropdown-toggle" href="#">By Category</a>
-                                <ul class="dropdown-menu">
-                                    <li>@Html.ActionLink("Fiction", "Category", "Sach", new { id = 1 }, new { @class = "dropdown-item" })</li>
-                                    <li>@Html.ActionLink("Non-Fiction", "Category", "Sach", new { id = 2 }, new { @class = "dropdown-item" })</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })
-                    </li>
-                </ul>
+                        <div id="userMenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; min-width: 200px; margin-top: 10px; z-index: 1000;">
+                            <a href="@Url.Action("Profile", "Account")" style="display: block; padding: 12px 20px; color: #333; border-bottom: 1px solid #eee;">
+                                <i class="fas fa-user"></i> Thông tin cá nhân
+                            </a>
+                            <a href="@Url.Action("MyOrders", "Order")" style="display: block; padding: 12px 20px; color: #333; border-bottom: 1px solid #eee;">
+                                <i class="fas fa-box"></i> Đơn hàng của tôi
+                            </a>
+                            <a href="@Url.Action("Logout", "Account")" style="display: block; padding: 12px 20px; color: #dc3545;">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" title="Đăng nhập">
+                        <i class="fas fa-user"></i>
+                    </a>
+                }
             </div>
         </div>
-    </nav>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
     </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div>
+                <h4>Về chúng tôi</h4>
+                <p>Nhà sách trực tuyến hàng đầu Việt Nam</p>
+                <p>Cung cấp hàng ngàn đầu sách chất lượng</p>
+            </div>
+            <div>
+                <h4>Chính sách</h4>
+                <a href="#">Chính sách đổi trả</a>
+                <a href="#">Chính sách bảo mật</a>
+                <a href="#">Điều khoản sử dụng</a>
+            </div>
+            <div>
+                <h4>Liên hệ</h4>
+                <p><i class="fas fa-phone"></i> 1900 xxxx</p>
+                <p><i class="fas fa-envelope"></i> support@fahasa.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> TP. Hồ Chí Minh</p>
+            </div>
+            <div>
+                <h4>Theo dõi chúng tôi</h4>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="#"><i class="fab fa-youtube"></i> Youtube</a>
+            </div>
+        </div>
+    </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/multilevel")
+
+    <script>
+    // Khi trang load xong
+    $(document).ready(function () {
+        updateCartCount();
+
+        // Đóng menu user khi click ra ngoài
+        $(document).click(function (event) {
+            if (!$(event.target).closest('.header-icons').length) {
+                $('#userMenu').hide();
+            }
+        });
+    });
+
+    // Cập nhật số lượng giỏ hàng
+    function updateCartCount() {
+        // Tạm thời lấy từ localStorage (sau có thể lấy từ server)
+        var count = localStorage.getItem('cartCount') || 0;
+        $('#cartCount').text(count);
+    }
+
+    // Toggle menu user
+    function toggleUserMenu() {
+        var menu = document.getElementById('userMenu');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // Thêm vào giỏ hàng
+    function addToCart(bookId) {
+        $.ajax({
+            url: '@Url.Action("AddToCart", "Sach")',
+            type: 'POST',
+            data: { bookId: bookId, quantity: 1 },
+            success: function (response) {
+                if (response.success) {
+                    $('#cartCount').text(response.cartCount);
+                    localStorage.setItem('cartCount', response.cartCount);
+                    alert('Đã thêm vào giỏ hàng!');
+                } else if (response.requireLogin) {
+                    if (confirm('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng. Đăng nhập ngay?')) {
+                        window.location.href = '@Url.Action("Login", "Account")'
+                            + '?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }
+                } else {
+                    alert(response.message || 'Có lỗi xảy ra!');
+                }
+            },
+            error: function () {
+                alert('Có lỗi xảy ra khi thêm vào giỏ hàng!');
+            }
+        });
+    }
+    </script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

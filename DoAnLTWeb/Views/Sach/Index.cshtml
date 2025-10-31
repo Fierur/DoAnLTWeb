@@ -38,7 +38,10 @@
                                             {
                                                 <li class="mb-1">
                                                     <small>
-                                                        @Html.ActionLink("→ " + (string)child.TenTLS, "Index", new { theLoaiId = child.MaTLS }, new { @class = "text-decoration-none text-muted" })
+                                                        @Html.ActionLink("→ " + (string)child.TenTheLoai,
+                                                            "Index",
+                                                            new { theLoaiId = child.ParentId, subCategory = child.SubCategoryKey },
+                                                            new { @class = "text-decoration-none text-muted" })
                                                     </small>
                                                 </li>
                                             }

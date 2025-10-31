@@ -1,0 +1,44 @@
+﻿@model DoAnLTWeb.Models.KhachHang
+@{
+    ViewBag.Title = "Đăng ký";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center mt-4">Đăng ký tài khoản</h2>
+
+@using (Html.BeginForm("Register", "Account", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label>Họ tên</label>
+        @Html.TextBoxFor(m => m.HoTenKH, new { @class = "form-control", placeholder = "Nhập họ tên" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Email</label>
+        @Html.TextBoxFor(m => m.email, new { @class = "form-control", placeholder = "Nhập email" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Số điện thoại</label>
+        @Html.TextBoxFor(m => m.SDT, new { @class = "form-control", placeholder = "Nhập số điện thoại" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Địa chỉ</label>
+        @Html.TextBoxFor(m => m.DiaChiKH, new { @class = "form-control", placeholder = "Nhập địa chỉ" })
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Mật khẩu</label>
+        @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control", placeholder = "Nhập mật khẩu" })
+    </div>
+
+    if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+    }
+
+    <button type="submit" class="btn btn-success mt-3 w-100">Đăng ký</button>
+}
