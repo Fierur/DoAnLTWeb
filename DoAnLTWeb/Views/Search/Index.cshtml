@@ -1,0 +1,305 @@
+﻿@model IEnumerable<DoAnLTWeb.Models.Sach>
+
+@{
+    ViewBag.Title = "Tìm kiếm sách";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">
+        <i class="fas fa-search"></i> Kết quả tìm kiếm
+        @if (!string.IsNullOrEmpty(ViewBag.SearchString))
+        {
+            <small class="text-muted">cho "@ViewBag.SearchString"</small>
+        }
+    </h2>
+
+    <div class="row">
+        <!-- Sidebar Lọc -->
+        <div class="col-md-3">
+            <!-- Form tìm kiếm -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Tìm kiếm</h5>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Index", "Search", FormMethod.Get, new { id = "searchForm" }))
+                    {
+                        <input type="hidden" name="theLoaiId" value="@ViewBag.TheLoaiId" />
+                        <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+                        <input type="hidden" name="minPrice" value="@ViewBag.MinPrice" />
+                        <input type="hidden" name="maxPrice" value="@ViewBag.MaxPrice" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Từ khóa</label>
+                            <input type="text" name="searchString" class="form-control"
+                                   placeholder="Nhập tên sách, tác giả..."
+                                   value="@ViewBag.SearchString" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Lọc theo thể loại -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-book"></i> Thể loại sách</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="@Url.Action("Index", new {
+                                searchString = ViewBag.SearchString,
+                                sortOrder = ViewBag.SortOrder,
+                                minPrice = ViewBag.MinPrice,
+                                maxPrice = ViewBag.MaxPrice
+                            })"
+                           class="list-group-item list-group-item-action @(ViewBag.TheLoaiId == null ? "active" : "")">
+                            <i class="fas fa-list"></i> Tất cả thể loại
+                        </a>
+                        @foreach (var tl in (List<DoAnLTWeb.Models.TheLoaiSach>)ViewBag.TheLoaiList)
+                        {
+                            <a href="@Url.Action("Index", new {
+                                    searchString = ViewBag.SearchString,
+                                    theLoaiId = tl.MaTLS,
+                                    sortOrder = ViewBag.SortOrder,
+                                    minPrice = ViewBag.MinPrice,
+                                    maxPrice = ViewBag.MaxPrice
+                                })"
+                               class="list-group-item list-group-item-action @(ViewBag.TheLoaiId == tl.MaTLS ? "active" : "")">
+                                <i class="fas fa-bookmark"></i> @tl.TenTLS
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lọc theo giá -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Khoảng giá</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="@Url.Action("Index")">
+                        <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                        <input type="hidden" name="theLoaiId" value="@ViewBag.TheLoaiId" />
+                        <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+
+                        <!-- Khoảng giá nhanh -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Chọn nhanh:</label>
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Index", new {
+                                        searchString = ViewBag.SearchString,
+                                        theLoaiId = ViewBag.TheLoaiId,
+                                        sortOrder = ViewBag.SortOrder,
+                                        minPrice = 0,
+                                        maxPrice = 100
+                                    })" class="btn btn-outline-secondary btn-sm">
+                                    Dưới 100,000₫
+                                </a>
+                                <a href="@Url.Action("Index", new {
+                                        searchString = ViewBag.SearchString,
+                                        theLoaiId = ViewBag.TheLoaiId,
+                                        sortOrder = ViewBag.SortOrder,
+                                        minPrice = 100,
+                                        maxPrice = 200
+                                    })" class="btn btn-outline-secondary btn-sm">
+                                    100,000₫ - 200,000₫
+                                </a>
+                                <a href="@Url.Action("Index", new {
+                                        searchString = ViewBag.SearchString,
+                                        theLoaiId = ViewBag.TheLoaiId,
+                                        sortOrder = ViewBag.SortOrder,
+                                        minPrice = 200,
+                                        maxPrice = 300
+                                    })" class="btn btn-outline-secondary btn-sm">
+                                    200,000₫ - 300,000₫
+                                </a>
+                                <a href="@Url.Action("Index", new {
+                                        searchString = ViewBag.SearchString,
+                                        theLoaiId = ViewBag.TheLoaiId,
+                                        sortOrder = ViewBag.SortOrder,
+                                        minPrice = 300
+                                    })" class="btn btn-outline-secondary btn-sm">
+                                    Trên 300,000₫
+                                </a>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- Tùy chỉnh khoảng giá -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tùy chỉnh:</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" name="minPrice" class="form-control form-control-sm"
+                                           placeholder="Từ" value="@ViewBag.MinPrice" min="0" />
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="maxPrice" class="form-control form-control-sm"
+                                           placeholder="Đến" value="@ViewBag.MaxPrice" min="0" />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 btn-sm">
+                            <i class="fas fa-filter"></i> Áp dụng
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Nút xóa bộ lọc -->
+            @if (ViewBag.TheLoaiId != null || ViewBag.MinPrice != null || ViewBag.MaxPrice != null || !string.IsNullOrEmpty(ViewBag.SearchString))
+            {
+                <div class="d-grid">
+                    <a href="@Url.Action("Index", "Search")" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Xóa tất cả bộ lọc
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- Danh sách sách -->
+        <div class="col-md-9">
+            <!-- Thanh sắp xếp -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <strong>Tìm thấy @ViewBag.TotalResults sách</strong>
+                            @if (!string.IsNullOrEmpty(ViewBag.TenTheLoai))
+                            {
+                                <span class="badge bg-primary">@ViewBag.TenTheLoai</span>
+                            }
+                            @if (ViewBag.MinPrice != null || ViewBag.MaxPrice != null)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    @(ViewBag.MinPrice != null ? string.Format("{0:N0}₫", ViewBag.MinPrice) : "0₫")
+                                    -
+                                    @(ViewBag.MaxPrice != null ? string.Format("{0:N0}₫", ViewBag.MaxPrice) : "∞")
+                                </span>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <form method="get" action="@Url.Action("Index")" class="d-flex justify-content-end">
+                                <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                                <input type="hidden" name="theLoaiId" value="@ViewBag.TheLoaiId" />
+                                <input type="hidden" name="minPrice" value="@ViewBag.MinPrice" />
+                                <input type="hidden" name="maxPrice" value="@ViewBag.MaxPrice" />
+
+                                <label class="me-2 align-self-center mb-0">Sắp xếp:</label>
+                                <select name="sortOrder" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                                    <option value="">Mặc định</option>
+                                    <option value="price_asc" @(ViewBag.SortOrder == "price_asc" ? "selected" : "")>
+                                        Giá: Thấp đến Cao
+                                    </option>
+                                    <option value="price_desc" @(ViewBag.SortOrder == "price_desc" ? "selected" : "")>
+                                        Giá: Cao đến Thấp
+                                    </option>
+                                    <option value="name_asc" @(ViewBag.SortOrder == "name_asc" ? "selected" : "")>
+                                        Tên: A-Z
+                                    </option>
+                                    <option value="name_desc" @(ViewBag.SortOrder == "name_desc" ? "selected" : "")>
+                                        Tên: Z-A
+                                    </option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách sách -->
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                @if (!string.IsNullOrEmpty(item.Hinh))
+                                {
+                                    <img src="@Url.Content("~/Images/" + item.Hinh)"
+                                         class="card-img-top"
+                                         alt="@item.TenSach"
+                                         style="height: 300px; object-fit: cover;"
+                                         onerror="this.src='@Url.Content("~/Images/no-image.jpg")'" />
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+                                         style="height: 300px;">
+                                        <span class="text-white">Không có ảnh</span>
+                                    </div>
+                                }
+
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title">@item.TenSach</h6>
+                                    <p class="card-text text-muted mb-1">
+                                        <small>
+                                            <i class="fas fa-bookmark"></i>
+                                            @(item.TheLoaiSach != null ? item.TheLoaiSach.TenTLS : "N/A")
+                                        </small>
+                                    </p>
+                                    <p class="card-text text-muted mb-2">
+                                        <small>
+                                            @if (!string.IsNullOrEmpty(item.Mota) && item.Mota.Length > 80)
+                                            {
+                                                @item.Mota.Substring(0, 80)<text>...</text>
+                                            }
+                                            else
+                                            {
+                                                @item.Mota
+                                            }
+                                        </small>
+                                    </p>
+                                    <div class="mt-auto">
+                                        <p class="h5 text-danger mb-2">
+                                            @(item.Gia != null ? string.Format("{0:N0} ₫", item.Gia) : "Liên hệ")
+                                        </p>
+                                        @Html.ActionLink("Xem chi tiết", "Details", "Sach", new { id = item.MaSach }, new { @class = "btn btn-primary w-100 btn-sm" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h4>Không tìm thấy sách nào!</h4>
+                    <p>Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc.</p>
+                    <a href="@Url.Action("Index", "Search")" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Xóa bộ lọc và tìm lại
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-item.active {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .card {
+        transition: transform 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .form-label.fw-bold {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+</style>

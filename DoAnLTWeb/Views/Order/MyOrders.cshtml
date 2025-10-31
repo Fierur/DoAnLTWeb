@@ -1,0 +1,43 @@
+﻿@model IEnumerable<DoAnLTWeb.Models.DonDatHang>
+@{
+    ViewBag.Title = "Đơn hàng của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center mt-4">Đơn hàng của tôi</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-center text-muted mt-3">Bạn chưa có đơn hàng nào.</p>
+}
+else
+{
+    <table class="table table-hover mt-4">
+        <thead class="table-light">
+            <tr>
+                <th>Mã đơn</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var don in Model)
+            {
+                var tt = don.ChiTietTrangThais.OrderByDescending(t => t.NgayCapNhatTT).FirstOrDefault();
+                <tr>
+                    <td>@don.MaDon</td>
+                    <td>
+                        @(don.NgayDat.HasValue ? don.NgayDat.Value.ToString("dd/MM/yyyy") : "")
+                    </td>
+                    <td>@String.Format("{0:N0} đ", don.TongTien)</td>
+                    <td>@(tt?.TrangThai?.TenTT ?? "Chưa xác định")</td>
+                    <td>
+                        @Html.ActionLink("Chi tiết", "OrderDetail", "Order", new { id = don.MaDon }, new { @class = "btn btn-sm btn-info" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

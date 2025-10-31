@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Đặt hàng thành công";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var donHang = ViewBag.DonHang as DoAnLTWeb.Models.DonDatHang;
+    var chiTiet = ViewBag.ChiTietDonHang as List<DoAnLTWeb.Models.ChiTietDonDH>;
+}
+
+<h2 class="text-center mt-4 text-success">🎉 Đặt hàng thành công!</h2>
+
+<div class="card p-4 mt-3 shadow-sm">
+    <p><strong>Mã đơn hàng:</strong> @donHang.MaDon</p>
+    <p>
+        <strong>Ngày đặt:</strong> @(donHang.NgayDat.HasValue ? donHang.NgayDat.Value.ToString("dd/MM/yyyy") : "")
+    </p>
+    <p><strong>Tổng tiền:</strong> @String.Format("{0:N0} đ", donHang.TongTien)</p>
+
+    <h5 class="mt-3">Chi tiết đơn hàng</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tên sách</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in chiTiet)
+            {
+                <tr>
+                    <td>@item.Sach.TenSach</td>
+                    <td>@item.SoLuongCTDDH</td>
+                    <td>@String.Format("{0:N0} đ", item.DonGiaCTDDH)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @Html.ActionLink("Xem đơn hàng của tôi", "MyOrders", "Order", null, new { @class = "btn btn-primary mt-3" })
+</div>

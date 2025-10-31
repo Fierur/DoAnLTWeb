@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var donHang = ViewBag.DonHang as DoAnLTWeb.Models.DonDatHang;
+    var chiTiet = ViewBag.ChiTietDonHang as List<DoAnLTWeb.Models.ChiTietDonDH>;
+    var lichSu = ViewBag.LichSuTrangThai as List<DoAnLTWeb.Models.ChiTietTrangThai>;
+}
+
+<h2 class="mt-4 text-center">Chi tiết đơn hàng #@donHang.MaDon</h2>
+
+<div class="card p-3 mt-3 shadow-sm">
+    <p>
+        <strong>Ngày đặt:</strong> @(donHang.NgayDat.HasValue ? donHang.NgayDat.Value.ToString("dd/MM/yyyy") : "")
+    </p>
+    <p><strong>Tổng tiền:</strong> @String.Format("{0:N0} đ", donHang.TongTien)</p>
+
+    <h5 class="mt-3">Danh sách sản phẩm</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tên sách</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in chiTiet)
+            {
+                <tr>
+                    <td>@item.Sach.TenSach</td>
+                    <td>@item.SoLuongCTDDH</td>
+                    <td>@String.Format("{0:N0} đ", item.DonGiaCTDDH)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h5 class="mt-3">Lịch sử trạng thái</h5>
+    <ul class="list-group">
+        @foreach (var tt in lichSu)
+        {
+            <li class="list-group-item">
+                <strong>@tt.TrangThai.TenTT</strong> - @(tt.NgayCapNhatTT.HasValue ? tt.NgayCapNhatTT.Value.ToString("dd/MM/yyyy") : "")<br />
+                <small>@tt.GhiChuTT</small>
+            </li>
+        }
+    </ul>
+
+    <form action="@Url.Action("CancelOrder", "Order")" method="post" class="mt-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="maDon" value="@donHang.MaDon" />
+        <input type="text" name="lyDoHuy" class="form-control" placeholder="Lý do hủy (tùy chọn)" />
+        <button type="submit" class="btn btn-danger mt-2">Hủy đơn hàng</button>
+    </form>
+</div>

@@ -92,12 +92,21 @@
                     </table>
 
                     <div class="d-grid gap-2">
-                        <button class="btn btn-success btn-lg" type="button">
-                            Thêm vào giỏ hàng
-                        </button>
-                        <button class="btn btn-danger btn-lg" type="button">
-                            Mua ngay
-                        </button>
+                        @Html.ActionLink(
+                            "Thêm vào giỏ hàng",
+                            "AddToCart",
+                            "Cart",
+                            new { id = Model.MaSach, returnUrl = Request.Url?.ToString() },
+                            new { @class = "btn btn-success btn-lg w-100" }
+                        )
+
+                        @Html.ActionLink(
+                            "Mua ngay",
+                            "BuyNow",
+                            "Cart",
+                            new { id = Model.MaSach },
+                            new { @class = "btn btn-danger btn-lg w-100" }
+                        )
                     </div>
                 </div>
             </div>

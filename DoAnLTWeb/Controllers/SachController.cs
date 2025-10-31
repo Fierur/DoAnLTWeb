@@ -145,6 +145,171 @@ namespace DoAnLTWeb.Controllers
             ViewBag.TheLoaiMenu = menuList;
         }
 
+        // Thêm vào giỏ hàng
+        [HttpPost]
+        public JsonResult AddToCart(int bookId, int quantity = 1)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                if (Session["MaKH"] == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập", requireLogin = true });
+                }
+
+                int maKH = (int)Session["MaKH"];
+
+                var khachHang = db.KhachHangs.Find(maKH);
+                if (khachHang == null || !khachHang.MaGH.HasValue)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập" });
+                }
+
+                int maGH = khachHang.MaGH.Value;
+
+                // Kiểm tra sách đã có trong giỏ chưa
+                var existingItem = db.ChiTietGHs
+                    .FirstOrDefault(c => c.MaGH == maGH && c.MaSach == bookId);
+
+                if (existingItem != null)
+                {
+                    // Cập nhật số lượng
+                    existingItem.SoLuongSachCTGH = (existingItem.SoLuongSachCTGH ?? 0) + quantity;
+                }
+                else
+                {
+                    // Thêm mới
+                    var chiTiet = new ChiTietGH
+                    {
+                        MaGH = maGH,
+                        MaSach = bookId,
+                        SoLuongSachCTGH = quantity
+                    };
+                    db.ChiTietGHs.Add(chiTiet);
+                }
+
+                // Cập nhật ngày update giỏ hàng
+                var gioHang = db.GioHangs.Find(maGH);
+                if (gioHang != null)
+                {
+                    gioHang.NgayUpdateCuoiGH = DateTime.Now;
+                }
+
+                db.SaveChanges();
+
+                // Đếm số lượng items trong giỏ
+                int cartCount = db.ChiTietGHs
+                    .Where(c => c.MaGH == maGH)
+                    .Sum(c => c.SoLuongSachCTGH ?? 0);
+
+                return Json(new { success = true, cartCount = cartCount });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Xem giỏ hàng
+        public ActionResult Cart()
+        {
+            if (Session["MaKH"] == null)
+            {
+                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Cart", "Sach") });
+            }
+
+            int maKH = (int)Session["MaKH"];
+            var khachHang = db.KhachHangs.Find(maKH);
+
+            if (khachHang == null || !khachHang.MaGH.HasValue)
+            {
+                return View(new List<ChiTietGH>());
+            }
+
+            var cartItems = db.ChiTietGHs
+                .Include("Sach")
+                .Where(c => c.MaGH == khachHang.MaGH.Value)
+                .ToList();
+
+            return View(cartItems);
+        }
+
+        // Xóa khỏi giỏ hàng
+        [HttpPost]
+        public JsonResult RemoveFromCart(int bookId)
+        {
+            try
+            {
+                if (Session["MaKH"] == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập" });
+                }
+
+                int maKH = (int)Session["MaKH"];
+                var khachHang = db.KhachHangs.Find(maKH);
+
+                if (khachHang != null && khachHang.MaGH.HasValue)
+                {
+                    var item = db.ChiTietGHs
+                        .FirstOrDefault(c => c.MaGH == khachHang.MaGH.Value && c.MaSach == bookId);
+
+                    if (item != null)
+                    {
+                        db.ChiTietGHs.Remove(item);
+                        db.SaveChanges();
+                    }
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Cập nhật số lượng trong giỏ
+        [HttpPost]
+        public JsonResult UpdateCartQuantity(int bookId, int quantity)
+        {
+            try
+            {
+                if (Session["MaKH"] == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập" });
+                }
+
+                int maKH = (int)Session["MaKH"];
+                var khachHang = db.KhachHangs.Find(maKH);
+
+                if (khachHang != null && khachHang.MaGH.HasValue)
+                {
+                    var item = db.ChiTietGHs
+                        .FirstOrDefault(c => c.MaGH == khachHang.MaGH.Value && c.MaSach == bookId);
+
+                    if (item != null)
+                    {
+                        if (quantity <= 0)
+                        {
+                            db.ChiTietGHs.Remove(item);
+                        }
+                        else
+                        {
+                            item.SoLuongSachCTGH = quantity;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
