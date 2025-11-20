@@ -9,7 +9,9 @@
     var trangThaiHienTai = lichSu?.OrderByDescending(t => t.NgayCapNhatTT).FirstOrDefault();
 }
 
-<h2 class="mt-4 text-center">Chi tiết đơn hàng #@donHang.MaDon</h2>
+<h2 class="mt-4 text-center">
+    <i class="fas fa-receipt"></i> Chi tiết đơn hàng #@donHang.MaDon
+</h2>
 
 @if (TempData["Success"] != null)
 {
@@ -27,134 +29,279 @@
     </div>
 }
 
-<div class="card p-3 mt-3 shadow-sm">
-    <p>
-        <strong>Ngày đặt:</strong> @(donHang.NgayDat.HasValue ? donHang.NgayDat.Value.ToString("dd/MM/yyyy") : "")
-    </p>
-    <p><strong>Tổng tiền:</strong> @String.Format("{0:N0} đ", donHang.TongTien)</p>
+<div class="row mt-4">
+    <!-- Thông tin đơn hàng -->
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-calendar-alt text-primary"></i>
+                            <strong>Ngày đặt:</strong>
+                            @(donHang.NgayDat.HasValue ? donHang.NgayDat.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-credit-card text-success"></i>
+                            <strong>Hình thức thanh toán:</strong>
+                            @(donHang.HinhThucThanhToan?.TenHTTT ?? "N/A")
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-truck text-info"></i>
+                            <strong>Phí vận chuyển:</strong>
+                            @String.Format("{0:N0} đ", donHang.PhiShip)
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-percentage text-warning"></i>
+                            <strong>Thuế VAT:</strong>
+                            @((donHang.ThueVAT ?? 0) * 100)%
+                        </p>
+                    </div>
+                </div>
 
-    @* Hiển thị trạng thái hiện tại *@
-    <p>
-        <strong>Trạng thái:</strong>
-        @if (trangThaiHienTai != null && trangThaiHienTai.TrangThai != null)
-        {
-            var tenTrangThai = trangThaiHienTai.TrangThai.TenTT;
-            var badgeClass = "badge ";
-
-            switch (trangThaiHienTai.MaTT)
-            {
-                case 1001: // Chờ xác nhận
-                    badgeClass += "bg-warning text-dark";
-                    break;
-                case 1002: // Đang giao
-                    badgeClass += "bg-info";
-                    break;
-                case 1003: // Hoàn tất
-                    badgeClass += "bg-success";
-                    break;
-                case 1004: // Đã hủy
-                    badgeClass += "bg-danger";
-                    break;
-                default:
-                    badgeClass += "bg-secondary";
-                    break;
-            }
-
-            <span class="@badgeClass fs-6 px-3 py-2">
-                <i class="fas fa-circle-info"></i> @tenTrangThai
-            </span>
-        }
-        else
-        {
-            <span class="badge bg-secondary fs-6">N/A</span>
-        }
-    </p>
-
-    @* Nút hủy đơn hàng - chỉ hiển thị khi đang "Chờ xác nhận" *@
-    @if (trangThaiHienTai != null && trangThaiHienTai.MaTT == 1001)
-    {
-        <div class="mt-3">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
-                <i class="fas fa-times-circle"></i> Hủy đơn hàng
-            </button>
-        </div>
-    }
-
-    <h5 class="mt-4">Danh sách sản phẩm</h5>
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>Tên sách</th>
-                <th style="width: 20%;">Số lượng</th>
-                <th style="width: 25%;">Đơn giá</th>
-                <th style="width: 25%;">Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in chiTiet)
-            {
-                <tr>
-                    <td>@item.Sach.TenSach</td>
-                    <td class="text-center">@item.SoLuongCTDDH</td>
-                    <td>@String.Format("{0:N0} đ", item.DonGiaCTDDH)</td>
-                    <td class="fw-bold">@String.Format("{0:N0} đ", item.DonGiaCTDDH * item.SoLuongCTDDH)</td>
-                </tr>
-            }
-        </tbody>
-        <tfoot class="table-light">
-            <tr>
-                <td colspan="3" class="text-end fw-bold">Phí vận chuyển:</td>
-                <td class="fw-bold">@String.Format("{0:N0} đ", donHang.PhiShip)</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="text-end fw-bold">Thuế VAT (@((donHang.ThueVAT ?? 0) * 100)%):</td>
-                <td class="fw-bold">@String.Format("{0:N0} đ", chiTiet.Sum(c => c.DonGiaCTDDH * c.SoLuongCTDDH) * (donHang.ThueVAT ?? 0))</td>
-            </tr>
-            <tr class="table-warning">
-                <td colspan="3" class="text-end fw-bold fs-5">TỔNG CỘNG:</td>
-                <td class="fw-bold text-danger fs-5">@String.Format("{0:N0} đ", donHang.TongTien)</td>
-            </tr>
-        </tfoot>
-    </table>
-
-    @* Lịch sử trạng thái *@
-    @if (lichSu != null && lichSu.Any())
-    {
-        <h5 class="mt-4">Lịch sử trạng thái đơn hàng</h5>
-        <div class="timeline">
-            @foreach (var item in lichSu.OrderBy(t => t.NgayCapNhatTT))
-            {
-                <div class="timeline-item mb-3">
-                    <div class="d-flex align-items-start">
-                        <div class="timeline-marker me-3">
-                            <i class="fas fa-circle text-primary"></i>
-                        </div>
-                        <div>
-                            <p class="mb-1">
-                                <strong>@item.TrangThai.TenTT</strong>
-                                <span class="text-muted ms-2">
-                                    @(item.NgayCapNhatTT.HasValue ? item.NgayCapNhatTT.Value.ToString("dd/MM/yyyy HH:mm") : "")
+                <!-- Địa chỉ giao hàng -->
+                @if (donHang.DiaChiGiaoHang != null)
+                {
+                    var diaChi = donHang.DiaChiGiaoHang;
+                    <hr class="my-3" />
+                    <div class="shipping-address-section">
+                        <h6 class="mb-3">
+                            <i class="fas fa-map-marker-alt text-danger"></i>
+                            <strong>Địa chỉ giao hàng</strong>
+                        </h6>
+                        <div class="address-info p-3 bg-light rounded">
+                            <p class="mb-2">
+                                <i class="fas fa-user"></i>
+                                <strong>Người nhận:</strong>
+                                <span class="ms-2">@diaChi.HoTenNN</span>
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-home"></i>
+                                <strong>Địa chỉ:</strong>
+                                <span class="ms-2">
+                                    @diaChi.SoNha,
+                                    @(diaChi.XaPhuong?.TenXP ?? ""),
+                                    @(diaChi.XaPhuong?.QuanHuyen?.TenQH ?? ""),
+                                    @(diaChi.XaPhuong?.QuanHuyen?.ThanhPho?.TenTP ?? "")
                                 </span>
                             </p>
-                            @if (!string.IsNullOrEmpty(item.GhiChuTT))
+                            @if (!string.IsNullOrEmpty(diaChi.GhiChu))
                             {
-                                <p class="text-muted mb-0"><small>@item.GhiChuTT</small></p>
+                                <p class="mb-0 mt-2 text-muted">
+                                    <i class="fas fa-sticky-note"></i>
+                                    <em>Ghi chú: @diaChi.GhiChu</em>
+                                </p>
                             }
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
+                }
 
-    <div class="mt-4">
-        @Html.ActionLink("← Quay lại danh sách đơn hàng", "MyOrders", "Order", null, new { @class = "btn btn-secondary" })
+                <!-- Trạng thái đơn hàng -->
+                <hr class="my-3" />
+                <div class="order-status-section">
+                    <h6 class="mb-3">
+                        <i class="fas fa-tasks text-primary"></i>
+                        <strong>Trạng thái đơn hàng</strong>
+                    </h6>
+                    @if (trangThaiHienTai != null && trangThaiHienTai.TrangThai != null)
+                    {
+                        var tenTrangThai = trangThaiHienTai.TrangThai.TenTT;
+                        var badgeClass = "badge fs-6 px-3 py-2 ";
+                        var iconClass = "";
+
+                        switch (trangThaiHienTai.MaTT)
+                        {
+                            case 1001: // Chờ xác nhận
+                                badgeClass += "bg-warning text-dark";
+                                iconClass = "fa-clock";
+                                break;
+                            case 1002: // Đang giao
+                                badgeClass += "bg-info";
+                                iconClass = "fa-shipping-fast";
+                                break;
+                            case 1003: // Hoàn tất
+                                badgeClass += "bg-success";
+                                iconClass = "fa-check-circle";
+                                break;
+                            case 1004: // Đã hủy
+                                badgeClass += "bg-danger";
+                                iconClass = "fa-times-circle";
+                                break;
+                            default:
+                                badgeClass += "bg-secondary";
+                                iconClass = "fa-circle-info";
+                                break;
+                        }
+
+                        <span class="@badgeClass">
+                            <i class="fas @iconClass"></i> @tenTrangThai
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary fs-6">N/A</span>
+                    }
+
+                    @* Nút hủy đơn hàng *@
+                    @if (trangThaiHienTai != null && trangThaiHienTai.MaTT == 1001)
+                    {
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                                <i class="fas fa-times-circle"></i> Hủy đơn hàng
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-shopping-bag"></i> Danh sách sản phẩm</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tên sách</th>
+                                <th style="width: 15%;" class="text-center">Số lượng</th>
+                                <th style="width: 20%;" class="text-end">Đơn giá</th>
+                                <th style="width: 20%;" class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in chiTiet)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Sach.TenSach</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">@item.SoLuongCTDDH</span>
+                                    </td>
+                                    <td class="text-end">@String.Format("{0:N0} đ", item.DonGiaCTDDH)</td>
+                                    <td class="text-end fw-bold text-primary">
+                                        @String.Format("{0:N0} đ", item.DonGiaCTDDH * item.SoLuongCTDDH)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Tạm tính:</td>
+                                <td class="text-end fw-bold">
+                                    @String.Format("{0:N0} đ", chiTiet.Sum(c => c.DonGiaCTDDH * c.SoLuongCTDDH))
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Phí vận chuyển:</td>
+                                <td class="text-end fw-bold">@String.Format("{0:N0} đ", donHang.PhiShip)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">
+                                    Thuế VAT (@((donHang.ThueVAT ?? 0) * 100)%):
+                                </td>
+                                <td class="text-end fw-bold">
+                                    @String.Format("{0:N0} đ", chiTiet.Sum(c => c.DonGiaCTDDH * c.SoLuongCTDDH) * (donHang.ThueVAT ?? 0))
+                                </td>
+                            </tr>
+                            <tr class="table-warning">
+                                <td colspan="3" class="text-end fw-bold fs-5">
+                                    <i class="fas fa-money-bill-wave"></i> TỔNG CỘNG:
+                                </td>
+                                <td class="text-end fw-bold text-danger fs-5">
+                                    @String.Format("{0:N0} đ", donHang.TongTien)
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Lịch sử trạng thái -->
+    <div class="col-md-4">
+        @if (lichSu != null && lichSu.Any())
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Lịch sử đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        @foreach (var item in lichSu.OrderByDescending(t => t.NgayCapNhatTT))
+                        {
+                            var iconClass = "";
+                            var colorClass = "";
+
+                            switch (item.MaTT)
+                            {
+                                case 1001:
+                                    iconClass = "fa-clock";
+                                    colorClass = "text-warning";
+                                    break;
+                                case 1002:
+                                    iconClass = "fa-shipping-fast";
+                                    colorClass = "text-info";
+                                    break;
+                                case 1003:
+                                    iconClass = "fa-check-circle";
+                                    colorClass = "text-success";
+                                    break;
+                                case 1004:
+                                    iconClass = "fa-times-circle";
+                                    colorClass = "text-danger";
+                                    break;
+                                default:
+                                    iconClass = "fa-circle";
+                                    colorClass = "text-secondary";
+                                    break;
+                            }
+
+                            <div class="timeline-item mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="timeline-icon me-3 @colorClass">
+                                        <i class="fas @iconClass fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1 fw-bold">@item.TrangThai.TenTT</p>
+                                        <p class="mb-1 text-muted small">
+                                            <i class="far fa-calendar-alt"></i>
+                                            @(item.NgayCapNhatTT.HasValue ? item.NgayCapNhatTT.Value.ToString("dd/MM/yyyy HH:mm") : "")
+                                        </p>
+                                        @if (!string.IsNullOrEmpty(item.GhiChuTT))
+                                        {
+                                            <p class="text-muted mb-0 small fst-italic">
+                                                <i class="fas fa-comment-dots"></i> @item.GhiChuTT
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                                <hr class="my-3" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-4 mb-4">
+    @Html.ActionLink("← Quay lại danh sách đơn hàng", "MyOrders", "Order", null, new { @class = "btn btn-secondary" })
 </div>
 
 @* Modal xác nhận hủy đơn hàng *@
 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="cancelOrderModalLabel">
@@ -163,8 +310,15 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-0">Bạn có chắc chắn muốn hủy đơn hàng <strong>#@donHang.MaDon</strong> không?</p>
-                <p class="text-muted mt-2"><small>Lưu ý: Hành động này không thể hoàn tác!</small></p>
+                <div class="text-center mb-3">
+                    <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <p class="mb-0 text-center">
+                    Bạn có chắc chắn muốn hủy đơn hàng <strong class="text-danger">#@donHang.MaDon</strong> không?
+                </p>
+                <p class="text-muted mt-2 text-center">
+                    <small><i class="fas fa-info-circle"></i> Lưu ý: Hành động này không thể hoàn tác!</small>
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -184,22 +338,103 @@
 </div>
 
 <style>
-    .timeline-marker {
-        font-size: 12px;
-        margin-top: 2px;
+    /* Shipping Address Styles */
+    .shipping-address-section {
+        border-left: 3px solid #dc3545;
+        padding-left: 15px;
     }
 
-    .timeline-item {
-        border-left: 2px solid #e9ecef;
-        padding-left: 20px;
+    .address-info {
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .address-info:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .address-info i {
+        width: 20px;
+        color: #6c757d;
+    }
+
+    /* Order Status Section */
+    .order-status-section {
+        border-left: 3px solid #007bff;
+        padding-left: 15px;
+    }
+
+    /* Timeline Styles */
+    .timeline {
         position: relative;
     }
 
-        .timeline-item:last-child {
-            border-left: none;
-        }
+    .timeline-item {
+        position: relative;
+    }
 
+    .timeline-icon {
+        min-width: 35px;
+        text-align: center;
+    }
+
+    .timeline-item:last-child hr {
+        display: none;
+    }
+
+    /* Card Hover Effects */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+
+    /* Badge Animations */
     .badge {
         font-weight: 500;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Table Responsive Improvements */
+    .table-responsive {
+        border-radius: 0 0 0.375rem 0.375rem;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Modal Improvements */
+    .modal-content {
+        border: none;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
     }
 </style>

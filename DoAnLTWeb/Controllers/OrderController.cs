@@ -334,9 +334,20 @@ namespace DoAnLTWeb.Controllers
 
             int maKH = (int)Session["MaKH"];
 
-            // Lấy danh sách đơn hàng, sắp xếp từ mới đến cũ
+            // Lấy danh sách đơn hàng, loại bỏ các đơn đã hủy (MaTT = 1004)
             var donHangList = db.DonDatHangs
                 .Where(d => d.MaKH == maKH)
+                .ToList()
+                .Where(d => {
+                    // Lấy trạng thái mới nhất của đơn hàng
+                    var trangThaiMoiNhat = db.ChiTietTrangThais
+                        .Where(ct => ct.MaDon == d.MaDon)
+                        .OrderByDescending(ct => ct.NgayCapNhatTT)
+                        .FirstOrDefault();
+
+                    // Chỉ hiển thị đơn hàng không có trạng thái "Đã hủy" (MaTT = 1004)
+                    return trangThaiMoiNhat == null || trangThaiMoiNhat.MaTT != 1004;
+                })
                 .OrderByDescending(d => d.NgayDat)
                 .ToList();
 
@@ -375,6 +386,14 @@ namespace DoAnLTWeb.Controllers
                 .Where(ct => ct.MaDon == id)
                 .OrderBy(ct => ct.NgayCapNhatTT)
                 .ToList();
+
+            // Kiểm tra nếu đơn hàng đã hủy (MaTT = 1004)
+            var trangThaiHienTai = lichSuTrangThai.OrderByDescending(t => t.NgayCapNhatTT).FirstOrDefault();
+            if (trangThaiHienTai != null && trangThaiHienTai.MaTT == 1004)
+            {
+                TempData["Info"] = "Đơn hàng này đã bị hủy.";
+                return RedirectToAction("MyOrders");
+            }
 
             ViewBag.DonHang = donHang;
             ViewBag.ChiTietDonHang = chiTietDonHang;
@@ -415,7 +434,7 @@ namespace DoAnLTWeb.Controllers
             if (trangThaiHienTai == null || trangThaiHienTai.MaTT != 1001)
             {
                 TempData["Error"] = "Không thể hủy đơn hàng này. Đơn hàng đã được xử lý!";
-                return RedirectToAction("OrderDetail", new { id = maDon });
+                return RedirectToAction("MyOrders");
             }
 
             // Cập nhật trạng thái thành "Đã hủy" (MaTT = 1004)
@@ -432,7 +451,7 @@ namespace DoAnLTWeb.Controllers
             db.SaveChanges();
 
             TempData["Success"] = "Đã hủy đơn hàng thành công!";
-            return RedirectToAction("OrderDetail", new { id = maDon });
+            return RedirectToAction("MyOrders");
         }
 
         protected override void Dispose(bool disposing)
