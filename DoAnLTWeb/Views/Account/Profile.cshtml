@@ -3,7 +3,92 @@
     ViewBag.Title = "Thông tin cá nhân";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    /* ===== FONT & NỀN ===== */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f5f5f5;
+}
 
+h2 {
+    font-weight: 600;
+    color: #333;
+}
+
+/* ===== CARD THÔNG TIN ===== */
+.card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 25px;
+    max-width: 600px;
+    margin: 30px auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.card strong {
+    color: #333;
+}
+
+.btn-primary {
+    background: #ff424e !important; 
+    border-color: #ff424e !important;
+    font-weight: 600;
+    padding: 10px 16px;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: #e63842 !important;
+}
+
+.btn-warning {
+    background: #ff9800 !important;
+    border-color: #ff9800 !important;
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background: #e68a00 !important;
+}
+
+.btn-danger {
+    background: #d32f2f !important;
+    border-color: #d32f2f !important;
+    font-weight: 600;
+}
+
+.btn-danger:hover {
+    background: #b71c1c !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+/* RESPONSIVE */
+@@media (max-width: 768px) {
+    .card {
+        margin: 15px;
+        padding: 20px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+</style>
 <h2 class="text-center mt-4">Thông tin cá nhân</h2>
 
 <div class="card p-4 mt-3 shadow-sm">

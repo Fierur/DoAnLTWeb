@@ -5,7 +5,96 @@
     var chiTietGH = ViewBag.ChiTietGH as List<DoAnLTWeb.Models.ChiTietGH>;
     double tongTien = ViewBag.TongTienSanPham ?? 0;
 }
+<style>
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        background-color: #f5f5f5;
+    }
 
+    h2, h4, h5 {
+        font-weight: 600;
+        color: #333;
+    }
+
+    label {
+        font-weight: 500;
+    }
+
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #eee;
+        font-size: 15px;
+        padding: 12px 16px;
+    }
+
+    
+    .col-md-4 {
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+}
+    .form-control {
+        border: 1px solid #ddd !important;
+        padding: 10px;
+        font-size: 14px;
+        border-radius: 4px !important;
+        transition: 0.25s ease-in-out;
+    }
+
+        .form-control:focus {
+            border-color: #ff424e !important;
+            box-shadow: 0 0 3px rgba(255, 66, 78, 0.5);
+        }
+
+    .btn-success {
+        background: #ff424e !important;
+        border-color: #ff424e !important;
+        font-weight: 600;
+        padding: 12px;
+        letter-spacing: 0.5px;
+        transition: 0.3s;
+    }
+
+        .btn-success:hover {
+            background: #e63842 !important;
+        }
+
+    .col-md-8 {
+        background: white;
+        padding: 25px;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin: auto;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px dashed #ddd;
+    }
+
+    #nhapDiaChiMoi {
+        margin-top: 15px;
+    }
+        #nhapDiaChiMoi .form-group label {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        #nhapDiaChiMoi .form-control {
+            height: 45px;
+        }
+
+    textarea.form-control {
+        height: 100px !important;
+        resize: none;
+    }
+    /*RESPONSIVE*/
+    @@media (max-width: 768px) {
+        .col-md-8, .col-md-4 {
+            margin-top: 20px;
+        }
+    }
+</style>
 <h2 class="mt-4 text-center">Thanh toán</h2>
 
 @if (TempData["Error"] != null)
@@ -30,31 +119,47 @@
                 </select>
             </div>
 
-            <hr />
-            <h5>Hoặc nhập địa chỉ mới</h5>
-            <div class="form-group">
-                <label>Họ tên người nhận</label>
-                <input type="text" name="hoTenNN" class="form-control" placeholder="Nhập họ tên" />
-            </div>
-            <div class="form-group mt-2">
-                <label>Số nhà / Đường</label>
-                <input type="text" name="soNha" class="form-control" placeholder="Số nhà, đường..." />
-            </div>
-            <div class="form-group mt-2">
-                <label>Thành phố</label>
-                @Html.DropDownList("maTP", ViewBag.ThanhPhoList as SelectList, "-- Chọn thành phố --", new { @class = "form-control", id = "ddlTP" })
-            </div>
-            <div class="form-group mt-2">
-                <label>Quận huyện</label>
-                <select id="ddlQH" class="form-control"></select>
-            </div>
-            <div class="form-group mt-2">
-                <label>Xã phường</label>
-                <select name="maXP" id="ddlXP" class="form-control"></select>
-            </div>
-            <div class="form-group mt-2">
-                <label>Ghi chú</label>
-                <textarea name="ghiChu" class="form-control"></textarea>
+            <div id="nhapDiaChiMoi">
+                <hr />
+                <h5>Hoặc nhập địa chỉ mới</h5>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Họ tên người nhận</label>
+                            <input type="text" name="hoTenNN" class="form-control" placeholder="Nhập họ tên" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Số nhà / Đường</label>
+                            <input type="text" name="soNha" class="form-control" placeholder="Số nhà, đường..." />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label>Thành phố</label>
+                        @Html.DropDownList("maTP", ViewBag.ThanhPhoList as SelectList, "-- Chọn --", new { @class = "form-control", id = "ddlTP" })
+                    </div>
+                    <div class="col-md-6">
+                        <label>Quận huyện</label>
+                        <select id="ddlQH" class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label>Xã phường</label>
+                        <select name="maXP" id="ddlXP" class="form-control"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Ghi chú</label>
+                        <textarea name="ghiChu" class="form-control"></textarea>
+                    </div>
+                </div>
             </div>
             <div class="form-group mt-2">
                 <label>Hình thức thanh toán</label>
@@ -85,7 +190,16 @@
 
 @section Scripts {
     <script>
-        // AJAX load quận huyện và xã phường 
+        // Ẩn/hiện phần nhập địa chỉ mới khi chọn địa chỉ có sẵn
+        $("select[name='diaChiCoSanId']").change(function () {
+            var value = $(this).val();
+            if (value) {
+                $("#nhapDiaChiMoi").hide();  // Ẩn nếu có địa chỉ sẵn
+            } else {
+                $("#nhapDiaChiMoi").show();  // Hiện nếu bỏ chọn
+            }
+        });
+        // AJAX load quận huyện và xã phường
         $("#ddlTP").change(function () {
             var maTP = $(this).val();
             $("#ddlQH").empty();

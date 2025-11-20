@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -79,8 +80,19 @@ namespace DoAnLTWeb.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register(KhachHang model)
         {
+            
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrEmpty(model.HoTenKH))
+                    ModelState.AddModelError("HoTenKH", "Họ tên không được để trống!");
+                if (string.IsNullOrEmpty(model.email))
+                    ModelState.AddModelError("email", "Email không được để trống!");
+                if (string.IsNullOrEmpty(model.SDT))
+                    ModelState.AddModelError("SDT", "Số điện thoại không được để trống!");
+
+                if (string.IsNullOrEmpty(model.MatKhau))
+                    ModelState.AddModelError("MatKhau", "Mật khẩu không được để trống!");
+
                 // Kiểm tra email đã tồn tại chưa
                 var existingEmail = db.KhachHangs.FirstOrDefault(k => k.email == model.email);
                 if (existingEmail != null)
@@ -114,7 +126,7 @@ namespace DoAnLTWeb.Controllers
                 Session["MaKH"] = model.MaKH;
                 Session["Email"] = model.email;
 
-                TempData["Success"] = "Đăng ký thành công! Chào mừng bạn đến với hệ thống.";
+                TempData["Success"] = "Đăng ký thành công! Chào mừng bạn đến với cửa hàng Bán Sách Vì Niềm Vui.";
                 return RedirectToAction("Index", "Sach");
             }
 
@@ -212,18 +224,22 @@ namespace DoAnLTWeb.Controllers
                 {
                     return HttpNotFound();
                 }
-
+                model.MatKhau = khachHang.MatKhau;
                 // Cập nhật thông tin
                 khachHang.HoTenKH = model.HoTenKH;
                 khachHang.email = model.email;
                 khachHang.SDT = model.SDT;
                 khachHang.DiaChiKH = model.DiaChiKH;
-
-                // Chỉ cập nhật mật khẩu nếu người dùng nhập mới
-                if (!string.IsNullOrEmpty(model.MatKhau))
-                {
-                    khachHang.MatKhau = model.MatKhau;
-                }
+                khachHang.MatKhau = model.MatKhau;
+                //if (string.IsNullOrEmpty(model.MatKhau))
+                //{
+                //    khachHang.MatKhau = currentPassword;
+                //}
+                //// Chỉ cập nhật mật khẩu nếu người dùng nhập mới
+                //if (!string.IsNullOrEmpty(model.MatKhau))
+                //{
+                //    khachHang.MatKhau = model.MatKhau;
+                //}
 
                 db.SaveChanges();
 
@@ -233,7 +249,7 @@ namespace DoAnLTWeb.Controllers
                 Session["Email"] = khachHang.email;
 
                 TempData["Success"] = "Cập nhật thông tin thành công!";
-                return RedirectToAction("Profile");
+                return RedirectToAction("Profile", "Account");
             }
 
             return View(model);

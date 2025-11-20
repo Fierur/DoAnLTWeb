@@ -4,33 +4,100 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="text-center mt-4">Chỉnh sửa thông tin</h2>
+<style>
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        background-color: #f5f5f5;
+    }
 
+    h2 {
+        font-weight: 600;
+        color: #333;
+    }
+
+    form {
+        background: #fff;
+        padding: 25px;
+        max-width: 500px;
+        margin: 30px auto;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .form-control {
+        border: 1px solid #ddd !important;
+        width: 450px;
+        max-width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border-radius: 4px !important;
+        transition: 0.25s ease-in-out;
+    }
+
+        .form-control:focus {
+            border-color: #ff424e !important;
+            box-shadow: 0 0 3px rgba(255, 66, 78, 0.5);
+        }
+
+    .btn-primary {
+        background: #ff424e !important;
+        border-color: #ff424e !important;
+        font-weight: 600;
+        padding: 11px;
+        letter-spacing: 0.5px;
+        transition: 0.3s;
+    }
+
+        .btn-primary:hover {
+            background: #e63842 !important;
+        }
+
+    .alert-danger {
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        form {
+            margin: 15px;
+            padding: 20px;
+        }
+    }
+</style>
+<h2 class="text-center mt-4">Chỉnh sửa thông tin</h2>
+@Html.ValidationSummary()
 @using (Html.BeginForm("Edit", "Account", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.MaKH)
-
     <div class="form-group">
         <label>Họ tên</label>
         @Html.TextBoxFor(m => m.HoTenKH, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.HoTenKH, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group mt-2">
         <label>Email</label>
         @Html.TextBoxFor(m => m.email, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.email, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group mt-2">
         <label>Số điện thoại</label>
         @Html.TextBoxFor(m => m.SDT, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.SDT, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group mt-2">
         <label>Địa chỉ</label>
         @Html.TextBoxFor(m => m.DiaChiKH, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.DiaChiKH, "", new { @class = "text-danger" })
     </div>
 
+    <div class="form-group mt-2">
+        @Html.HiddenFor(m => m.MatKhau)
+    </div>
     if (ViewBag.Error != null)
     {
         <div class="alert alert-danger mt-3">@ViewBag.Error</div>
