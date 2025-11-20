@@ -383,7 +383,57 @@ namespace DoAnLTWeb.Controllers
             return View();
         }
 
-        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CancelOrder(int maDon)
+        {
+            // Kiểm tra đăng nhập
+            if (Session["MaKH"] == null)
+            {
+                TempData["Error"] = "Vui lòng đăng nhập!";
+                return RedirectToAction("Login", "Account");
+            }
+
+            int maKH = (int)Session["MaKH"];
+
+            // Lấy thông tin đơn hàng
+            var donHang = db.DonDatHangs
+                .FirstOrDefault(d => d.MaDon == maDon && d.MaKH == maKH);
+
+            if (donHang == null)
+            {
+                TempData["Error"] = "Không tìm thấy đơn hàng!";
+                return RedirectToAction("MyOrders");
+            }
+
+            // Kiểm tra trạng thái đơn hàng - chỉ cho phép hủy khi đang "Chờ xác nhận" (MaTT = 1001)
+            var trangThaiHienTai = db.ChiTietTrangThais
+                .Where(ct => ct.MaDon == maDon)
+                .OrderByDescending(ct => ct.NgayCapNhatTT)
+                .FirstOrDefault();
+
+            if (trangThaiHienTai == null || trangThaiHienTai.MaTT != 1001)
+            {
+                TempData["Error"] = "Không thể hủy đơn hàng này. Đơn hàng đã được xử lý!";
+                return RedirectToAction("OrderDetail", new { id = maDon });
+            }
+
+            // Cập nhật trạng thái thành "Đã hủy" (MaTT = 1004)
+            var chiTietTrangThaiMoi = new ChiTietTrangThai
+            {
+                MaDon = maDon,
+                MaTT = 1004, // Đã hủy
+                NgayCapNhatTT = DateTime.Now,
+                GhiChuTT = "Khách hàng hủy đơn"
+            };
+            db.ChiTietTrangThais.Add(chiTietTrangThaiMoi);
+
+            // Lưu thay đổi
+            db.SaveChanges();
+
+            TempData["Success"] = "Đã hủy đơn hàng thành công!";
+            return RedirectToAction("OrderDetail", new { id = maDon });
+        }
 
         protected override void Dispose(bool disposing)
         {
