@@ -32,7 +32,7 @@ else
                         @(don.NgayDat.HasValue ? don.NgayDat.Value.ToString("dd/MM/yyyy") : "")
                     </td>
                     <td>@String.Format("{0:N0} đ", don.TongTien)</td>
-                    <td>@(tt?.TrangThai?.TenTT ?? "Chưa xác định")</td>
+                    <td>@(tt?.TrangThai?.TenTT ?? "Đang giao")</td>
                     <td>
                         @Html.ActionLink("Chi tiết", "OrderDetail", "Order", new { id = don.MaDon }, new { @class = "btn btn-sm btn-info" })
                     </td>
