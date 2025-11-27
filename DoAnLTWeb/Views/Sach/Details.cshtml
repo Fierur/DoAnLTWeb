@@ -54,7 +54,14 @@
                             <tr>
                                 <th style="width: 30%;">Thể loại:</th>
                                 <td>
-                                    @if (Model.TheLoaiSach != null)
+                                    @if (Model.TheLoaiSaches != null && Model.TheLoaiSaches.Any())
+                                    {
+                                        foreach (var theLoai in Model.TheLoaiSaches)
+                                        {
+                                            @Html.ActionLink(theLoai.TenTLS, "Index", new { theLoaiId = theLoai.MaTLS }, new { @class = "badge bg-primary text-decoration-none me-1" })
+                                        }
+                                    }
+                                    else if (Model.TheLoaiSach != null)
                                     {
                                         @Html.ActionLink(Model.TheLoaiSach.TenTLS, "Index", new { theLoaiId = Model.MaTLS }, new { @class = "badge bg-primary text-decoration-none" })
                                     }

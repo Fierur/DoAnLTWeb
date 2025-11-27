@@ -78,10 +78,22 @@ namespace DoAnLTWeb.Models
                 .WithMany(e => e.Saches)
                 .Map(m => m.ToTable("Sach_TacGia").MapLeftKey("MaSach").MapRightKey("MaTG"));
 
+            modelBuilder.Entity<Sach>()
+                .HasMany(e => e.TheLoaiSaches)
+                .WithMany(e => e.Saches)
+                .Map(m => m.ToTable("Sach_TheLoai")
+                .MapLeftKey("MaSach")
+                .MapRightKey("MaTLS"));
+
             modelBuilder.Entity<TrangThai>()
                 .HasMany(e => e.ChiTietTrangThais)
                 .WithRequired(e => e.TrangThai)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Sach>()
+                .HasMany(e => e.TheLoaiSaches)
+                .WithMany(e => e.Saches)
+                .Map(m => m.ToTable("Sach_TheLoai").MapLeftKey("MaSach").MapRightKey("MaTLS"));
         }
     }
 }

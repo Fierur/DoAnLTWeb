@@ -536,15 +536,38 @@
                                     <i class="fas fa-book" style="font-size: 48px; color: #CCC;"></i>
                                 </div>
                             }
-                            @if (item.TheLoaiSach != null)
+                            @* Hiển thị nhiều thể loại *@
+                            @if (item.TheLoaiSaches != null && item.TheLoaiSaches.Any())
                             {
-                                <span class="product-badge">@item.TheLoaiSach.TenTLS</span>
+                                <div style="position: absolute; top: 8px; left: 8px; display: flex; flex-direction: column; gap: 4px;">
+                                    @foreach (var theLoai in item.TheLoaiSaches.Take(2))
+                                    {
+                                        <span class="product-badge">@theLoai.TenTLS</span>
+                                    }
+                                </div>
+                            }
+                            else if (item.TheLoaiSach != null)
+                            {
+                            <span class="product-badge">@item.TheLoaiSach.TenTLS</span>
                             }
                         </div>
                         <div class="product-info">
                             <div class="product-category">
                                 <i class="fas fa-tag" style="font-size: 10px;"></i>
-                                <span>@(item.TheLoaiSach?.TenTLS ?? "Sách")</span>
+                                <span>
+                                    @if (item.TheLoaiSaches != null && item.TheLoaiSaches.Any())
+                                    {
+                                        string.Join(", ", item.TheLoaiSaches.Select(t => t.TenTLS));
+                                    }
+                                    else if (item.TheLoaiSach != null)
+                                    {
+                                        @item.TheLoaiSach.TenTLS
+                                    }
+                                    else
+                                    {
+                                        <text>Sách</text>
+                                    }
+                                                            </span>
                             </div>
                             <h3 class="product-title">@item.TenSach</h3>
                             <p class="product-description">

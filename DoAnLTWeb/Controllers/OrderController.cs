@@ -64,7 +64,10 @@ namespace DoAnLTWeb.Controllers
             var diaChiList = db.DiaChiGiaoHangs
                 .Where(dc => dc.MaKH == maKH)
                 .ToList();
-
+            if (!diaChiList.Any())
+            {
+                ViewBag.InfoMessage = "Bạn chưa có địa chỉ giao hàng nào. Vui lòng nhập địa chỉ mới bên dưới.";
+            }
             // Lấy danh sách thành phố, quận huyện, xã phường
             ViewBag.ThanhPhoList = new SelectList(db.ThanhPhoes.OrderBy(t => t.TenTP), "MaTP", "TenTP");
             ViewBag.HinhThucThanhToanList = new SelectList(db.HinhThucThanhToans, "MaHTTT", "TenHTTT");

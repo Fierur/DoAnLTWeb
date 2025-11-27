@@ -27,12 +27,13 @@
         padding: 12px 16px;
     }
 
-    
+
     .col-md-4 {
-    position: sticky;
-    top: 20px;
-    align-self: flex-start;
-}
+        position: sticky;
+        top: 20px;
+        align-self: flex-start;
+    }
+
     .form-control {
         border: 1px solid #ddd !important;
         padding: 10px;
@@ -75,6 +76,7 @@
     #nhapDiaChiMoi {
         margin-top: 15px;
     }
+
         #nhapDiaChiMoi .form-group label {
             font-weight: 500;
             margin-bottom: 4px;
@@ -101,7 +103,13 @@
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
-
+@if (ViewBag.InfoMessage != null)
+{
+    <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+        <i class="fas fa-info-circle"></i> @ViewBag.InfoMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 <div class="row mt-4">
     <div class="col-md-8">
         <h4>Địa chỉ giao hàng</h4>
@@ -110,13 +118,24 @@
 
             <div class="form-group">
                 <label>Chọn địa chỉ có sẵn:</label>
-                <select name="diaChiCoSanId" class="form-control">
-                    <option value="">-- Chọn địa chỉ --</option>
-                    @foreach (var dc in ViewBag.DiaChiList as List<DoAnLTWeb.Models.DiaChiGiaoHang>)
-                    {
-                        <option value="@dc.MaDCGH">@dc.HoTenNN - @dc.SoNha</option>
-                    }
-                </select>
+                @if (ViewBag.DiaChiList != null && ((List<DoAnLTWeb.Models.DiaChiGiaoHang>)ViewBag.DiaChiList).Any())
+                {
+                    <select name="diaChiCoSanId" class="form-control">
+                        <option value="">-- Nhập địa chỉ mới bên dưới --</option>
+                        @foreach (var dc in ViewBag.DiaChiList as List<DoAnLTWeb.Models.DiaChiGiaoHang>)
+                        {
+                            <option value="@dc.MaDCGH">@dc.HoTenNN - @dc.SoNha</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Bạn chưa có địa chỉ giao hàng. Vui lòng nhập địa chỉ mới bên dưới.
+                    </div>
+                    <input type="hidden" name="diaChiCoSanId" value="" />
+                }
             </div>
 
             <div id="nhapDiaChiMoi">
@@ -189,6 +208,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Ẩn/hiện phần nhập địa chỉ mới khi chọn địa chỉ có sẵn
         $("select[name='diaChiCoSanId']").change(function () {
@@ -199,6 +219,36 @@
                 $("#nhapDiaChiMoi").show();  // Hiện nếu bỏ chọn
             }
         });
+
+        // Kiểm tra xem có địa chỉ có sẵn không
+        var hasSavedAddress = $("select[name='diaChiCoSanId'] option").length > 1;
+
+        if (!hasSavedAddress) {
+            // Nếu không có địa chỉ, bắt buộc phải nhập địa chỉ mới
+            $("#nhapDiaChiMoi").show();
+        } else {
+            // Nếu có địa chỉ, ẩn form nhập mới ban đầu
+            $("#nhapDiaChiMoi").hide();
+        }
+        // Kiểm tra phương thức thanh toán
+        $("select[name='maHTTT']").change(function () {
+            var selectedValue = $(this).val();
+            // 802 là mã "Chuyển khoản ngân hàng"
+            if (selectedValue == "802") {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Thông báo',
+                    html: '<p style="font-size: 16px; line-height: 1.6;">Chức năng đang được phát triển.<br>Vui lòng chọn <strong>thanh toán khi nhận hàng</strong>.</p><p style="margin-top: 15px; color: #666;">Cảm ơn quý khách đã thông cảm cho sự bất tiện này.</p>',
+                    confirmButtonText: 'Đã hiểu',
+                    confirmButtonColor: '#ff424e',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    // Reset về option đầu tiên
+                    $(this).val("");
+                });
+            }
+        });
+
         // AJAX load quận huyện và xã phường
         $("#ddlTP").change(function () {
             var maTP = $(this).val();
@@ -236,21 +286,54 @@
             var maXP = $("#ddlXP").val();
             var httt = $("select[name='maHTTT']").val();
 
+            // Kiểm tra hình thức thanh toán
+            if (!httt) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thiếu thông tin',
+                    text: 'Vui lòng chọn hình thức thanh toán!',
+                    confirmButtonColor: '#ff424e'
+                });
+                e.preventDefault();
+                return false;
+            }
+
+            // Kiểm tra nếu chọn chuyển khoản
+            if (httt == "802") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Không thể thanh toán',
+                    text: 'Phương thức thanh toán này đang được phát triển. Vui lòng chọn thanh toán khi nhận hàng!',
+                    confirmButtonColor: '#ff424e'
+                });
+                e.preventDefault();
+                return false;
+            }
+
             // Nếu chưa chọn địa chỉ có sẵn thì bắt buộc phải nhập địa chỉ mới đầy đủ
             if (!diaChiCoSan) {
                 if (!hoTenNN || !soNha || !maTP || !maQH || !maXP) {
-                    alert("Vui lòng nhập đầy đủ thông tin địa chỉ giao hàng!");
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Thiếu thông tin',
+                        text: 'Vui lòng nhập đầy đủ thông tin địa chỉ giao hàng!',
+                        confirmButtonColor: '#ff424e'
+                    });
                     e.preventDefault();
                     return false;
                 }
             }
 
-            // Kiểm tra hình thức thanh toán
-            if (!httt) {
-                alert("Vui lòng chọn hình thức thanh toán!");
-                e.preventDefault();
-                return false;
-            }
+            // Hiển thị loading khi submit
+            Swal.fire({
+                title: 'Đang xử lý...',
+                html: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
             // Nếu qua được hết, form mới được submit
             return true;

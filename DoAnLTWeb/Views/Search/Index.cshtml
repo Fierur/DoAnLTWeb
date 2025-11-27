@@ -236,7 +236,18 @@
                             <p class="card-text text-muted mb-1">
                                 <small>
                                     <i class="fas fa-bookmark"></i>
-                                    @(item.TheLoaiSach != null ? item.TheLoaiSach.TenTLS : "N/A")
+                                    @if (item.TheLoaiSaches != null && item.TheLoaiSaches.Any())
+                                    {
+                                        string.Join(", ", item.TheLoaiSaches.Select(t => t.TenTLS));
+                                    }
+                                    else if (item.TheLoaiSach != null)
+                                    {
+                                        @item.TheLoaiSach.TenTLS
+                                    }
+                                    else
+                                    {
+                                        <text>N/A</text>
+                                    }
                                 </small>
                             </p>
                             <p class="card-text text-muted mb-2">

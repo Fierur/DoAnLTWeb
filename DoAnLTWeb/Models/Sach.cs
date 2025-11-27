@@ -15,6 +15,7 @@ namespace DoAnLTWeb.Models
             ChiTietDonDHs = new HashSet<ChiTietDonDH>();
             ChiTietGHs = new HashSet<ChiTietGH>();
             TacGias = new HashSet<TacGia>();
+            TheLoaiSaches = new HashSet<TheLoaiSach>();
         }
 
         [Key]
@@ -53,5 +54,8 @@ namespace DoAnLTWeb.Models
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TacGia> TacGias { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<TheLoaiSach> TheLoaiSaches { get; set; }
     }
 }
