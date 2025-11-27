@@ -52,7 +52,17 @@
                         </td>
                         <td>
                             <strong>@sach.TenSach</strong><br />
-                            <small class="text-muted">Thể loại: @(sach.TheLoaiSach?.TenTLS ?? "N/A")</small>
+                            <small class="text-muted">
+                                Thể loại:
+                                @if (sach.TheLoaiSaches != null && sach.TheLoaiSaches.Any())
+                                {
+                                    string.Join(", ", sach.TheLoaiSaches.Select(t => t.TenTLS));
+                                }
+                                else
+                                {
+                                    <text>N/A</text>
+                                }
+                            </small>
                         </td>
                         <td class="item-price" data-price="@donGia">@string.Format("{0:N0} ₫", donGia)</td>
                         <td>

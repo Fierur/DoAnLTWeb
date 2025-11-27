@@ -61,10 +61,6 @@
                                             @Html.ActionLink(theLoai.TenTLS, "Index", new { theLoaiId = theLoai.MaTLS }, new { @class = "badge bg-primary text-decoration-none me-1" })
                                         }
                                     }
-                                    else if (Model.TheLoaiSach != null)
-                                    {
-                                        @Html.ActionLink(Model.TheLoaiSach.TenTLS, "Index", new { theLoaiId = Model.MaTLS }, new { @class = "badge bg-primary text-decoration-none" })
-                                    }
                                     else
                                     {
                                         <span class="text-muted">N/A</span>
