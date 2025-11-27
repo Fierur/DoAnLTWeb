@@ -50,7 +50,7 @@ namespace DoAnLTWeb.Models
 
         public virtual NhaXuatBan NhaXuatBan { get; set; }
 
-        public virtual TheLoaiSach TheLoaiSach { get; set; }
+        //public virtual TheLoaiSach TheLoaiSach { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TacGia> TacGias { get; set; }

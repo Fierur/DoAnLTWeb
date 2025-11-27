@@ -56,9 +56,9 @@
         gap: 8px;
     }
 
-    .sidebar-header i {
-        font-size: 18px;
-    }
+        .sidebar-header i {
+            font-size: 18px;
+        }
 
     /* Category Menu */
     .category-menu {
@@ -71,9 +71,9 @@
         border-bottom: 1px solid var(--bookstore-border);
     }
 
-    .category-item:last-child {
-        border-bottom: none;
-    }
+        .category-item:last-child {
+            border-bottom: none;
+        }
 
     .category-link {
         display: flex;
@@ -86,18 +86,18 @@
         font-size: 14px;
     }
 
-    .category-link:hover {
-        background-color: #FFF5F5;
-        color: var(--bookstore-red);
-        padding-left: 20px;
-    }
+        .category-link:hover {
+            background-color: #FFF5F5;
+            color: var(--bookstore-red);
+            padding-left: 20px;
+        }
 
-    .category-link.active {
-        background-color: #FFF0F0;
-        color: var(--bookstore-red);
-        font-weight: 600;
-        border-left: 3px solid var(--bookstore-red);
-    }
+        .category-link.active {
+            background-color: #FFF0F0;
+            color: var(--bookstore-red);
+            font-weight: 600;
+            border-left: 3px solid var(--bookstore-red);
+        }
 
     .category-icon {
         width: 20px;
@@ -136,24 +136,24 @@
         position: relative;
     }
 
-    .submenu-link:before {
-        content: "→";
-        position: absolute;
-        left: 30px;
-        color: var(--bookstore-orange);
-    }
+        .submenu-link:before {
+            content: "→";
+            position: absolute;
+            left: 30px;
+            color: var(--bookstore-orange);
+        }
 
-    .submenu-link:hover {
-        background-color: white;
-        color: var(--bookstore-red);
-        padding-left: 52px;
-    }
+        .submenu-link:hover {
+            background-color: white;
+            color: var(--bookstore-red);
+            padding-left: 52px;
+        }
 
-    .submenu-link.active {
-        background-color: white;
-        color: var(--bookstore-red);
-        font-weight: 600;
-    }
+        .submenu-link.active {
+            background-color: white;
+            color: var(--bookstore-red);
+            font-weight: 600;
+        }
 
     /* Content Area */
     .content-area {
@@ -183,10 +183,10 @@
         transition: border-color 0.3s;
     }
 
-    .search-input:focus {
-        outline: none;
-        border-color: var(--bookstore-red);
-    }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--bookstore-red);
+        }
 
     .search-btn {
         padding: 12px 32px;
@@ -200,10 +200,10 @@
         transition: transform 0.2s;
     }
 
-    .search-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(201, 33, 39, 0.3);
-    }
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(201, 33, 39, 0.3);
+        }
 
     /* Filter Info */
     .filter-info {
@@ -222,10 +222,10 @@
         font-size: 14px;
     }
 
-    .filter-text strong {
-        color: var(--bookstore-red);
-        font-weight: 600;
-    }
+        .filter-text strong {
+            color: var(--bookstore-red);
+            font-weight: 600;
+        }
 
     .clear-filter-btn {
         padding: 6px 16px;
@@ -238,10 +238,10 @@
         transition: all 0.2s;
     }
 
-    .clear-filter-btn:hover {
-        background: var(--bookstore-red);
-        color: white;
-    }
+        .clear-filter-btn:hover {
+            background: var(--bookstore-red);
+            color: white;
+        }
 
     /* Product Grid */
     .product-grid {
@@ -262,10 +262,10 @@
         height: 100%;
     }
 
-    .product-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transform: translateY(-4px);
-    }
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+        }
 
     .product-image-container {
         position: relative;
@@ -368,11 +368,11 @@
         transition: all 0.2s;
     }
 
-    .product-btn:hover {
-        background: linear-gradient(to right, #B01D23, #C92127);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(201, 33, 39, 0.3);
-    }
+        .product-btn:hover {
+            background: linear-gradient(to right, #B01D23, #C92127);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(201, 33, 39, 0.3);
+        }
 
     /* No Results */
     .no-results {
@@ -539,16 +539,11 @@
                             @* Hiển thị nhiều thể loại *@
                             @if (item.TheLoaiSaches != null && item.TheLoaiSaches.Any())
                             {
-                                <div style="position: absolute; top: 8px; left: 8px; display: flex; flex-direction: column; gap: 4px;">
-                                    @foreach (var theLoai in item.TheLoaiSaches.Take(2))
-                                    {
-                                        <span class="product-badge">@theLoai.TenTLS</span>
-                                    }
-                                </div>
-                            }
-                            else if (item.TheLoaiSach != null)
-                            {
-                            <span class="product-badge">@item.TheLoaiSach.TenTLS</span>
+                                var firstCategory = item.TheLoaiSaches.FirstOrDefault();
+                                if (firstCategory != null)
+                                {
+                                    <span class="product-badge">@firstCategory.TenTLS</span>
+                                }
                             }
                         </div>
                         <div class="product-info">
@@ -559,15 +554,11 @@
                                     {
                                         string.Join(", ", item.TheLoaiSaches.Select(t => t.TenTLS));
                                     }
-                                    else if (item.TheLoaiSach != null)
-                                    {
-                                        @item.TheLoaiSach.TenTLS
-                                    }
                                     else
                                     {
                                         <text>Sách</text>
                                     }
-                                                            </span>
+                                </span>
                             </div>
                             <h3 class="product-title">@item.TenSach</h3>
                             <p class="product-description">
