@@ -210,6 +210,11 @@
                         if (res.requireLogin) {
                             showLoginPrompt();
                         } else if (res.success) {
+                            // CẬP NHẬT BADGE GIỎ HÀNG
+                            if (window.updateCartCount) {
+                                window.updateCartCount();
+                            }
+
                             Swal.fire({
                                 icon: "success",
                                 title: "Đã thêm vào giỏ hàng!",
@@ -227,7 +232,7 @@
                 });
             });
 
-            // Khi bấm Mua ngay
+           // Khi bấm Mua ngay
             $("#btnBuyNow").click(function () {
                 $.ajax({
                     url: '@Url.Action("AddToCart", "Sach")',
@@ -241,6 +246,11 @@
                         if (res.requireLogin) {
                             showLoginPrompt();
                         } else if (res.success) {
+                            // CẬP NHẬT BADGE GIỎ HÀNG
+                            if (window.updateCartCount) {
+                                window.updateCartCount();
+                            }
+
                             Swal.fire({
                                 icon: "success",
                                 title: "Thành công!",

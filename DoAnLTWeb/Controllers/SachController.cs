@@ -411,9 +411,6 @@ namespace DoAnLTWeb.Controllers
                     return Json(new { success = true, cartCount = 0 }, JsonRequestBehavior.AllowGet);
                 }
 
-                //int cartCount = db.ChiTietGHs
-                //    .Where(c => c.MaGH == khachHang.MaGH.Value)
-                //    .Sum(c => c.SoLuongSachCTGH ?? 0);
                 int cartCount = db.ChiTietGHs
                     .Where(c => c.MaGH == khachHang.MaGH.Value)
                     .Select(c => c.SoLuongSachCTGH)

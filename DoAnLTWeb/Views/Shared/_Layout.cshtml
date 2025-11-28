@@ -366,50 +366,6 @@
         @RenderBody()
     </div>
 
-    <!-- Footer -->
-    <!--<footer>
-        <div class="container">
-            <div>
-                <h4>Về chúng tôi</h4>
-                <p>Nhà sách trực tuyến hàng đầu Việt Nam</p>
-                <p>Cung cấp hàng ngàn đầu sách chất lượng</p>
-            </div>
-            <div>
-                <h4>Chính sách</h4>
-                <a href="#">Chính sách đổi trả</a>
-                <a href="#">Chính sách bảo mật</a>
-                <a href="#">Điều khoản sử dụng</a>
-            </div>
-            <div>
-                <h4>Liên hệ</h4>
-                <p><i class="fas fa-phone"></i> 1900 xxxx</p>
-                <p><i class="fas fa-envelope"></i> support@fahasa.com</p>
-                <p><i class="fas fa-map-marker-alt"></i> TP. Hồ Chí Minh</p>
-            </div>
-            <div>
-                <h4>Theo dõi chúng tôi</h4>
-                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-                <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-                <a href="#"><i class="fab fa-youtube"></i> Youtube</a>
-            </div>
-        </div>-->
-    <!-- Google Maps -->
-    <!--<div class="map-container">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.625545773045!2d106.6071535!3d10.8787612!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752bf64375f1cb%3A0x206811b0ea6552c1!2sNh%C3%A0%20S%C3%A1ch%20FAHASA%20H%C3%B3c%20M%C3%B4n!5e0!3m2!1svi!2svi!4v1731924960000!5m2!1svi!2svi"
-                width="600"
-                height="450"
-                style="border:0;"
-                allowfullscreen=""
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-    </div>-->
-    <!-- Copyright -->
-    <!--<div class="copyright">
-            <p>&copy; 2025 Nhà Sách Trực Tuyến. All rights reserved.</p>
-            <p>Địa chỉ: 261 Tô Ký, Ấp Mới 1, Hóc Môn, Thành phố Hồ Chí Minh</p>
-        </div>
-    </footer>-->
     <footer>
         <div class="container">
             <div>
@@ -455,39 +411,53 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
 
-    <script>
-        // Global function để cập nhật số lượng giỏ hàng
-        window.updateCartCount = function() {
-            $.ajax({
-                url: '@Url.Action("GetCartCount", "Sach")',
-                type: 'GET',
-                success: function(res) {
-                    if (res.success) {
-                        $('#cartCount').text(res.cartCount);
+<script>
+    // Global function để cập nhật số lượng giỏ hàng
+    window.updateCartCount = function() {
+        $.ajax({
+            url: '@Url.Action("GetCartCount", "Sach")',
+            type: 'GET',
+            success: function(res) {
+                if (res.success) {
+                    $('#cartCount').text(res.cartCount);
+
+                    // Ẩn badge nếu giỏ hàng trống
+                    if (res.cartCount === 0) {
+                        $('#cartCount').hide();
+                    } else {
+                        $('#cartCount').show();
                     }
                 }
-            });
-        };
+            },
+            error: function() {
+                console.log('Không thể cập nhật số lượng giỏ hàng');
+            }
+        });
+    };
 
-        // Khi trang load xong
-        $(document).ready(function () {
-            updateCartCount();
+    // Khi trang load xong
+    $(document).ready(function () {
+        updateCartCount();
 
-            // Đóng menu user khi click ra ngoài
-            $(document).click(function (event) {
-                if (!$(event.target).closest('.header-icons').length) {
-                    $('#userMenu').hide();
-                }
-            });
+        // Đóng menu user khi click ra ngoài
+        $(document).click(function (event) {
+            if (!$(event.target).closest('.header-icons').length) {
+                $('#userMenu').hide();
+            }
         });
 
-        // Toggle menu user
-        function toggleUserMenu() {
-            var menu = document.getElementById('userMenu');
-            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-        }
-    </script>
+        // Cập nhật giỏ hàng mỗi 30 giây (tùy chọn)
+        setInterval(function() {
+            updateCartCount();
+        }, 30000);
+    });
 
+    // Toggle menu user
+    function toggleUserMenu() {
+        var menu = document.getElementById('userMenu');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+</script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
